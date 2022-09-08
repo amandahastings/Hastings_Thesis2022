@@ -1,0 +1,188 @@
+---
+title: "Thesis2022_Q3"
+author: "Amanda Hastings"
+date: "2022-09-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+
+#Load libraries
+library(tidyverse)
+library(dplyr)
+library(RColorBrewer)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+```
+
+## Formatting raw thesis data and terraclimate data 
+
+```{r}
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+```
+
+## Terraclimate calculations 
+
+## Annual Climate Variables: VPD and CWD 
+
+```{r}
+#vpd.kPa.
+#def.mm.
+AnnualAvgTerra <- TerraData %>%
+  group_by(SiteID) %>% 
+  summarize(meanVPD = mean(vpd.kPa.), 
+            sdVPD = sd(vpd.kPa.), 
+            meanCWD = mean(def.mm.), 
+            sdCWD = sd(def.mm.)) 
+
+PostAnnualTerra2019 <- TerraData %>% 
+  group_by(SiteID, Year)%>% 
+  filter(Year == 2019)%>% 
+  group_by(SiteID)%>%
+  summarize(mean2019VPD = mean(vpd.kPa.),
+            mean2019CWD = mean(def.mm.))
+
+PostAnnualTerra2020 <- TerraData %>%
+  group_by(SiteID, Year)%>%
+  filter(Year == 2020)%>% 
+  group_by(SiteID)%>%
+  summarize(mean2020VPD = mean(vpd.kPa.),
+            mean2020CWD = mean(def.mm.))
+  
+PostAnnualTerra2021 <- TerraData %>% 
+  group_by(SiteID, Year)%>%
+  filter(Year == 2021)%>% 
+  group_by(SiteID)%>% 
+  summarize(mean2021VPD = mean(vpd.kPa.),
+            mean2021CWD = mean(def.mm.))
+
+PostAnnual3yr <- TerraData %>% 
+  group_by(SiteID, Year)%>% 
+  filter(Year == 2019:2021)%>% 
+  group_by(SiteID)%>%
+  summarize(mean3yrVPD = mean(vpd.kPa.),
+            mean3yrCWD = mean(def.mm.))
+
+PostAnnualJoin <- inner_join(PostAnnualTerra2019,PostAnnualTerra2020)%>% 
+  inner_join(PostAnnualTerra2021)%>% 
+  inner_join(PostAnnual3yr)%>%
+  relocate(SiteID)
+
+AnnualDeviation <- inner_join(AnnualAvgTerra,PostAnnualJoin)%>% 
+  mutate("dev2019VPD" = (mean2019VPD - meanVPD)/sdVPD)%>% 
+  mutate("dev2019CWD"= (mean2019CWD - meanCWD)/sdCWD)%>%
+  mutate("dev2020VPD" = (mean2020VPD - meanVPD)/sdVPD)%>% 
+  mutate("dev2020CWD"= (mean2020CWD - meanCWD)/sdCWD)%>%
+  mutate("dev2021VPD" = (mean2021VPD - meanVPD)/sdVPD)%>% 
+  mutate("dev2021CWD"= (mean2021CWD - meanCWD)/sdCWD)%>% 
+  mutate("dev3yrVPD" = (mean3yrVPD - meanVPD)/sdVPD)%>% 
+  mutate("dev3yrCWD" = (mean3yrCWD - meanCWD)/sdCWD)
+```
+
+## Growing Season Climate Variables: Max Temp, Min Temp, Precip, Soil Moisture
+
+```{r}
+#tmax.degC. 
+#tmin.degC.
+#ppt.mm.
+#soil.mm.
+GrowSeasonAvgTerra <- TerraData %>%
+  filter(Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID) %>% 
+  summarize(meanTmax = mean(tmax.degC.), 
+            sdTmax = sd(tmax.degC.), 
+            meanTmin = mean(tmin.degC.), 
+            sdTmin = sd(tmin.degC.),
+            meanPrecip = mean(ppt.mm.),
+            sdPrecip = sd(ppt.mm.),
+            meanSoil = mean(soil.mm.), 
+            sdSoil = sd(soil.mm.)) 
+
+PostGrowTerra2019 <- TerraData %>%
+  group_by(SiteID, Year)%>%
+  filter(Year == 2019 & Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID)%>%
+  summarize(mean2019Tmax = mean(tmax.degC.),
+            mean2019Tmin = mean(tmin.degC.),
+            mean2019Precip = mean(ppt.mm.),
+            mean2019Soil = mean(soil.mm.))
+
+PostGrowTerra2020 <- TerraData %>%
+  group_by(SiteID, Year)%>%
+  filter(Year == 2020 & Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID)%>%
+  summarize(mean2020Tmax = mean(tmax.degC.),
+            mean2020Tmin = mean(tmin.degC.),
+            mean2020Precip = mean(ppt.mm.),
+            mean2020Soil = mean(soil.mm.))
+
+PostGrowTerra2021 <- TerraData %>%
+  group_by(SiteID, Year)%>%
+  filter(Year == 2021 & Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID)%>%
+  summarize(mean2021Tmax = mean(tmax.degC.),
+            mean2021Tmin = mean(tmin.degC.),
+            mean2021Precip = mean(ppt.mm.),
+            mean2021Soil = mean(soil.mm.))
+
+PostGrowTerra3yr <- TerraData %>%
+  group_by(SiteID, Year)%>%
+  filter(Year == 2019:2021 & Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID)%>%
+  summarize(mean3yrTmax = mean(tmax.degC.),
+            mean3yrTmin = mean(tmin.degC.),
+            mean3yrPrecip = mean(ppt.mm.),
+            mean3yrSoil = mean(soil.mm.))
+
+PostGrowTerraJoin <- inner_join(PostGrowTerra2019,PostGrowTerra2020)%>% 
+  inner_join(PostGrowTerra2021)%>% 
+  inner_join(PostGrowTerra3yr)%>%
+  relocate(SiteID)
+ 
+
+GrowDeviation <- inner_join(GrowSeasonAvgTerra,PostGrowTerraJoin)%>%
+  mutate("dev2019Tmax" = (mean2019Tmax - meanTmax)/sdTmax)%>%
+  mutate("dev2019Tmin"= (mean2019Tmin - meanTmin)/sdTmin)%>%
+  mutate("dev2019Precip" = (mean2019Precip - meanPrecip)/sdPrecip)%>%
+  mutate("dev2019Soil"= (mean2019Soil - meanSoil)/sdSoil)%>%
+  mutate("dev2020Tmax" = (mean2020Tmax - meanTmax)/sdTmax)%>%
+  mutate("dev2020Tmin"= (mean2020Tmin - meanTmin)/sdTmin)%>%
+  mutate("dev2020Precip" = (mean2020Precip - meanPrecip)/sdPrecip)%>%
+  mutate("dev2020Soil"= (mean2020Soil - meanSoil)/sdSoil)%>%
+  mutate("dev2021Tmax" = (mean2021Tmax - meanTmax)/sdTmax)%>%
+  mutate("dev2021Tmin"= (mean2021Tmin - meanTmin)/sdTmin)%>%
+  mutate("dev2021Precip" = (mean2021Precip - meanPrecip)/sdPrecip)%>%
+  mutate("dev2021Soil"= (mean2021Soil - meanSoil)/sdSoil)%>% 
+  mutate("dev3yrTmax" = (mean3yrTmax - meanTmax)/sdTmax)%>% 
+  mutate("dev3yrTmin" = (mean3yrTmin - meanTmin)/sdTmin)%>% 
+  mutate("dev2021Precip" = (mean3yrPrecip - meanPrecip)/sdPrecip)%>%
+  mutate("dev2021Soil"= (mean3yrSoil - meanSoil)/sdSoil)
+  
+```
+
+## Data frame with deviations 
+
+```{r}
+ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
+```
+
+## Full data frame with terraclimate and thesis data
+
+```{r}
+ThesisAll <- cbind(ThesisData, ThesisTerra)
+```
+
+
+
+
+
