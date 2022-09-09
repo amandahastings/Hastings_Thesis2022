@@ -182,6 +182,37 @@ ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
 ThesisAll <- cbind(ThesisData, ThesisTerra)
 ```
 
+## Full data frame for each forest type 
+
+```{r}
+LowerMontaneAll <- ThesisAll %>% 
+  filter(forest_type == "Lower Montane")
+
+UpperMontaneAll <- ThesisAll %>% 
+  filter(forest_type == "Upper Montane")
+
+SubalpineAll <- ThesisAll %>% 
+  filter(forest_type == "Subalpine")
+```
+
+
+```{r}
+
+```
+
+# Visualizing the data 
+
+```{r}
+#Topographic variables 
+
+#Slope 
+
+#Aspect 
+
+#Heat load index 
+
+
+```
 
 
 
