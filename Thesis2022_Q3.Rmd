@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #Read in data 
 ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
 TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
 
 #Load libraries
 library(tidyverse)
@@ -29,6 +30,11 @@ library(multcompView)
 #Filter to only wanted sites in ThesisData 
 ThesisData <- ThesisDataRaw %>% 
   filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+ThesisSeedlings <- ThesisSeedlingsData %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))
+
 ```
 
 ## Terraclimate calculations 
@@ -173,26 +179,25 @@ GrowDeviation <- inner_join(GrowSeasonAvgTerra,PostGrowTerra3yr)%>%
 ## Data frame with deviations 
 
 ```{r}
-ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
+ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)%>% 
+  rename("PlotID"= SiteID)
 ```
 
 ## Full data frame with terraclimate and thesis data
 
 ```{r}
-ThesisAll <- cbind(ThesisData, ThesisTerra)
+ThesisAll <- cbind(ThesisData, ThesisSeedlings)%>% 
+  rename("PlotID2" = 77) %>% 
+  dplyr::select(!PlotID2)
+  
+
 ```
 
-## Full data frame for each forest type 
+## Data frame for NMDS 
 
 ```{r}
-# LowerMontaneAll <- ThesisAll %>% 
-#   filter(forest_type == "Lower Montane")
-# 
-# UpperMontaneAll <- ThesisAll %>% 
-#   filter(forest_type == "Upper Montane")
-# 
-# SubalpineAll <- ThesisAll %>% 
-#   filter(forest_type == "Subalpine")
+ThesisNMDS <- ThesisAll %>% 
+  dplyr::select(PlotID, forest_type, property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, invasive_present, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, gm_cover, fb_cover, sh_cover, tr_cover, total_cover, total_ba, live_ba, dead_ba)
 ```
 
 
