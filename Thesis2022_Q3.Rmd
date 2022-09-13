@@ -33,7 +33,8 @@ ThesisData <- ThesisDataRaw %>%
 
 ThesisSeedlings <- ThesisSeedlingsData %>% 
   filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
-  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
+  select_if(~!any(is.na(.)))
 
 ```
 
@@ -180,30 +181,31 @@ GrowDeviation <- inner_join(GrowSeasonAvgTerra,PostGrowTerra3yr)%>%
 
 ```{r}
 ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)%>% 
-  rename("PlotID"= SiteID)
+  dplyr::rename("PlotID"= SiteID)
+
+ThesisTerradf <- as.data.frame(ThesisTerra)
+
 ```
 
-## Full data frame with terraclimate and thesis data
+## Full data frame with thesis field data
 
 ```{r}
-ThesisAll <- cbind(ThesisData, ThesisSeedlings)%>% 
-  rename("PlotID2" = 77) %>% 
-  dplyr::select(!PlotID2)
-  
-
+ThesisAll <- cbind(ThesisData, ThesisSeedlings, ThesisTerra)%>% 
+  dplyr::select(-c(77, 113))
+names(ThesisAll)
 ```
 
 ## Data frame for NMDS 
 
 ```{r}
-ThesisNMDS <- ThesisAll %>% 
-  dplyr::select(PlotID, forest_type, property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, invasive_present, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, gm_cover, fb_cover, sh_cover, tr_cover, total_cover, total_ba, live_ba, dead_ba)
+ThesisNMDS <- ThesisAll %>%
+  dplyr::select(PlotID, forest_type, property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, invasive_present, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, gm_cover, fb_cover, sh_cover, tr_cover, total_cover, total_ba, live_ba, dead_ba, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
+  mutate("BinaryInvasive" = case_when(invasive_present == "No" ~ 0,
+         invasive_present != "No" ~ 1))%>% 
+  mutate("BareSubstrate" = bg_cover + rk_cover)%>% 
+  mutate("LtSubstrate" = lt_cover + wd_cover)
 ```
 
-
-```{r}
-
-```
 
 # Visualizing the data 
 
