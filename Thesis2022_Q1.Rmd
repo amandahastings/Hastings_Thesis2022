@@ -1,0 +1,53 @@
+---
+title: "Thesis2022_Q1"
+author: "Amanda Hastings"
+date: "2022-09-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Q1: How are different tree species regenerating across forest types at low and high burn severities?
+
+```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
+
+#Load libraries
+library(tidyverse)
+library(dplyr)
+library(RColorBrewer)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+```
+
+## Formatting raw thesis site data and seedlings data 
+
+```{r}
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+ThesisSeedlings <- ThesisSeedlingsData %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
+  select_if(~!any(is.na(.)))
+
+```
+
+## Combining site data with seedlings data
+
+```{r}
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID")
+```
+
+
+
+
+

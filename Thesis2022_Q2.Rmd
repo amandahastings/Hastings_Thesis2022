@@ -1,0 +1,67 @@
+---
+title: "Thesis2022_Q2"
+author: "Amanda Hastings"
+date: "2022-09-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Q2: How does post-fire vegetation cover vary between low and high severity within and across each forest type? 
+
+
+```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
+
+#Load libraries
+library(tidyverse)
+library(dplyr)
+library(RColorBrewer)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+```
+
+## Formatting raw thesis site data and seedlings data 
+
+```{r}
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+ThesisSeedlings <- ThesisSeedlingsData %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
+  select_if(~!any(is.na(.)))
+
+```
+
+## Combining site data with seedlings data
+
+```{r}
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID")
+```
+
+# Plant Cover Long Data
+
+```{r}
+# Facet wrap plant cover data
+PlantCoverLong <- ThesisAll1 %>%
+  dplyr::select(PlotID, forest_type, burn_sev_category, gm_cover:tr_cover) %>%
+  tidyr::pivot_longer(gm_cover:tr_cover,
+    names_to = "FunctionalGroup",
+    values_to = "PercentPlantCover"
+  ) %>%
+  mutate(FunctionalGroup = factor(
+    FunctionalGroup)) %>%
+  mutate(forest_type = factor(
+    forest_type,
+    levels = c("Lower Montane", "Upper Montane","Subalpine")))
+```
+

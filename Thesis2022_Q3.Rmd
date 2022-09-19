@@ -108,13 +108,28 @@ GrowDeviation <- inner_join(GrowSeasonAvgTerra,PostGrowTerra3yr)%>%
 
 ```{r}
 ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
+ 
 ```
 
 ## Full data frame with terraclimate and thesis data
 
 ```{r}
-ThesisAll <- cbind(ThesisData, ThesisTerra, ThesisSeedlings)
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID")
+  
+# ThesisAll1[order(ThesisAll1$PlotID),]
+
+#### Still need to figure out duplicate rows and NAs
+ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
+  
 ```
+
+
+
+```{r}
+ThesisNMDS <- ThesisAll1 %>% 
+  dplyr::select(PlotID, forest_type, property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, invasive_present, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, gm_cover, fb_cover, sh_cover, tr_cover, total_cover, total_ba, live_ba, dead_ba)
+```
+
 
 
 ## Attempts at NMDS 
