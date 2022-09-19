@@ -9,6 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+# Q3: What are the most prominent factors driving post-fire tree regeneration and community composition? 
+
+
 ```{r}
 #Read in data 
 ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
@@ -24,7 +28,7 @@ library(multcomp)
 library(multcompView)
 ```
 
-## Formatting raw thesis data and terraclimate data 
+## Formatting raw thesis site data and seedlings data 
 
 ```{r}
 #Filter to only wanted sites in ThesisData 
@@ -109,28 +113,21 @@ ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
 ## Full data frame with terraclimate and thesis data
 
 ```{r}
-ThesisAll <- cbind(ThesisData, ThesisTerra)
+ThesisAll <- cbind(ThesisData, ThesisTerra, ThesisSeedlings)
 ```
 
-## Full data frame for each forest type 
 
-```{r}
-LowerMontaneAll <- ThesisAll %>% 
-  filter(forest_type == "Lower Montane")
-
-UpperMontaneAll <- ThesisAll %>% 
-  filter(forest_type == "Upper Montane")
-
-SubalpineAll <- ThesisAll %>% 
-  filter(forest_type == "Subalpine")
-```
-
+## Attempts at NMDS 
 
 ```{r}
 
 ```
+
+
 
 # Visualizing the data 
+
+## Topographic variables
 
 ```{r}
 #Topographic variables 
