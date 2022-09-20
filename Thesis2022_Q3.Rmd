@@ -120,7 +120,7 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 # ThesisAll1[order(ThesisAll1$PlotID),]
 
 #### Still need to figure out duplicate rows and NAs
-ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
+# ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
   
 ```
 
@@ -129,7 +129,7 @@ ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", al
 ```{r}
 library(psycho)
 ThesisNMDSResponse <- ThesisAll1 %>% 
-  dplyr::select(PlotID, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
+  dplyr::select(PlotID, forest_type, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
   mutate_at(vars(PIPO_total,ABLA_total,PIEN_total), as.numeric)
 
 z_NMDSResponse <- ThesisNMDSResponse %>% 
@@ -141,7 +141,16 @@ z_NMDSResponse <- ThesisNMDSResponse %>%
 ## Overlay matrix with predictors 
 
 ```{r}
-# dplyr::select(PlotID, forest_type, property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, invasive_present, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, gm_cover, fb_cover, sh_cover, tr_cover, total_cover, total_ba, live_ba, dead_ba)
+OverlayPredictors1 <- ThesisAll1 %>% 
+  dplyr::select(property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
+  rowwise()%>%
+  mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
+  mutate(organic_cover = sum(c(lt_cover,wd_cover)))
+
+# z_OverlayPredictors <- OverlayPredictors1
+#   mutate(across)
+
+str(OverlayPredictors1)
 ```
 
 
