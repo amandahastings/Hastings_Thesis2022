@@ -127,7 +127,7 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 ## NMDS response data frame 
 
 ```{r}
-library(psycho)
+
 ThesisNMDSResponse <- ThesisAll1 %>% 
   dplyr::select(PlotID, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
   mutate_at(vars(PIPO_total,ABLA_total,PIEN_total), as.numeric)
@@ -135,13 +135,16 @@ ThesisNMDSResponse <- ThesisAll1 %>%
 z_NMDSResponse <- ThesisNMDSResponse %>% 
   mutate(across(gm_cover:PIEN_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
   replace(is.na(.),0)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))%>% 
+  remove_rownames %>% 
+  column_to_rownames(var="PlotID")
 
 ```
 
-## Overlay matrix with predictors 
+## Overlay predictors data frame 
 
 ```{r}
+#OVerlay predictors data frame 
 OverlayPredictors1 <- ThesisAll1 %>% 
   dplyr::select(property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
   rowwise()%>%
@@ -161,8 +164,8 @@ library(vegan)
 library(ggvegan)
 library(ggpubr)
 
-
 NMDS <- metaMDS(z_NMDSResponse, distance = "euclidean", k=2)
+
 
 ```
 
