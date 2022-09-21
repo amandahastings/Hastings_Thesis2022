@@ -137,25 +137,42 @@ ThesisNMDSResponse <- ThesisAll1 %>%
 z_NMDSResponse <- ThesisNMDSResponse %>% 
   mutate(across(gm_cover:PIEN_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
   replace(is.na(.),0)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))%>% 
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))%>% 
   remove_rownames %>% 
   column_to_rownames(var="PlotID")
 
-#Lower Montane NMDS
-z_NMDSdf_LowerMontane <- z_NMDSResponse %>% 
-  filter(forest_type == "Lower Montane")%>% 
-  dplyr::select(!c(forest_type, z_PIAR_total, z_ABLA_total, z_PIEN_total))
+#Rename columns with species 
+z_NMDSResponse1 <- z_NMDSResponse %>% 
+    rename(
+      "Forbs" = z_fb_cover,
+      "Shrubs" = z_sh_cover,
+      "POTR" = z_POTR_total,
+      "QUGA" = z_QUGA_total,
+      "RONE" = z_RONE_total,
+      "PIPO" = z_PIPO_total,
+      "PSME" = z_PSME_total,
+      "ABCO" = z_ABCO_total,
+      "PICO" = z_PICO_total,
+      "PIFL" = z_PIFL_total,
+      "PIAR" = z_PIAR_total,
+      "ABLA" = z_ABLA_total,
+      "PIEN" = z_PIEN_total)
 
+#Lower Montane NMDS
+z_NMDSdf_LowerMontane <- z_NMDSResponse1 %>% 
+  filter(forest_type == "Lower Montane")%>% 
+  dplyr::select(!c(forest_type, PIAR, ABLA, PIEN)) 
+  
 
 #Upper Montane NMDS  
-z_NMDSdf_UpperMontane <- z_NMDSResponse %>% 
+z_NMDSdf_UpperMontane <- z_NMDSResponse1 %>% 
   filter(forest_type == "Upper Montane")%>% 
   dplyr::select(!c(forest_type))
 
 #Subalpine NMDS
-z_NMDSdf_Subalpine <- z_NMDSResponse %>% 
+z_NMDSdf_Subalpine <- z_NMDSResponse1 %>% 
   filter(forest_type == "Subalpine")%>% 
-  dplyr::select(!c(forest_type, z_QUGA_total, z_RONE_total, z_PIPO_total))
+  dplyr::select(!c(forest_type, QUGA, RONE, PIPO))
   
 
 ```
@@ -184,21 +201,31 @@ library(ggvegan)
 library(ggpubr)
 
 #NMDS Lower Montane 
-NMDS_LowerMontane <- metaMDS(z_NMDSdf_LowerMontane, distance = "euclidean", k=2, autotransform = F)
-ordiplot(NMDS_LowerMontane, type = 't')
+NMDS_LowerMontane <- metaMDS(z_NMDSdf_LowerMontane, distance = "euclidean", autotransform = F)
+ordiplot(NMDS_LowerMontane, type="t")
 str(NMDS_LowerMontane)
+vegan:: stressplot(NMDS_LowerMontane)
 
 #NMDS Upper Montane 
 NMDS_UpperMontane <- metaMDS(z_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F)
 ordiplot(NMDS_UpperMontane, type = 't')
 str(NMDS_UpperMontane)
+vegan:: stressplot(NMDS_UpperMontane)
 
 #NMDS Subalpine 
 NMDS_Subalpine <- metaMDS(z_NMDSdf_Subalpine, distance = "euclidean", k=2, autotransform = F)
 ordiplot(NMDS_Subalpine, type = 't')
 str(NMDS_Subalpine)
+vegan:: stressplot(NMDS_Subalpine)
 
 ```
 
 
 ```{r}
+head(fortify(NMDS_LowerMontane.mds))
+
+```
+
+
+
+
