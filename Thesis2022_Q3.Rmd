@@ -115,7 +115,8 @@ ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
 
 ```{r}
 ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
-  arrange(PlotID)
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))
   
 # ThesisAll1[order(ThesisAll1$PlotID),]
 
@@ -129,15 +130,33 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 ```{r}
 
 ThesisNMDSResponse <- ThesisAll1 %>% 
-  dplyr::select(PlotID, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
+  dplyr::select(PlotID, forest_type, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
   mutate_at(vars(PIPO_total,ABLA_total,PIEN_total), as.numeric)
 
+#Standardize by zscore
 z_NMDSResponse <- ThesisNMDSResponse %>% 
   mutate(across(gm_cover:PIEN_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
   replace(is.na(.),0)%>% 
   dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))%>% 
   remove_rownames %>% 
   column_to_rownames(var="PlotID")
+
+#Lower Montane NMDS
+z_NMDSdf_LowerMontane <- z_NMDSResponse %>% 
+  filter(forest_type == "Lower Montane")%>% 
+  dplyr::select(!c(forest_type, z_PIAR_total, z_ABLA_total, z_PIEN_total))
+
+
+#Upper Montane NMDS  
+z_NMDSdf_UpperMontane <- z_NMDSResponse %>% 
+  filter(forest_type == "Upper Montane")%>% 
+  dplyr::select(!c(forest_type))
+
+#Subalpine NMDS
+z_NMDSdf_Subalpine <- z_NMDSResponse %>% 
+  filter(forest_type == "Subalpine")%>% 
+  dplyr::select(!c(forest_type, z_QUGA_total, z_RONE_total, z_PIPO_total))
+  
 
 ```
 
@@ -164,29 +183,22 @@ library(vegan)
 library(ggvegan)
 library(ggpubr)
 
-NMDS <- metaMDS(z_NMDSResponse, distance = "euclidean", k=2)
+#NMDS Lower Montane 
+NMDS_LowerMontane <- metaMDS(z_NMDSdf_LowerMontane, distance = "euclidean", k=2, autotransform = F)
+ordiplot(NMDS_LowerMontane, type = 't')
+str(NMDS_LowerMontane)
 
+#NMDS Upper Montane 
+NMDS_UpperMontane <- metaMDS(z_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F)
+ordiplot(NMDS_UpperMontane, type = 't')
+str(NMDS_UpperMontane)
+
+#NMDS Subalpine 
+NMDS_Subalpine <- metaMDS(z_NMDSdf_Subalpine, distance = "euclidean", k=2, autotransform = F)
+ordiplot(NMDS_Subalpine, type = 't')
+str(NMDS_Subalpine)
 
 ```
 
-
-
-# Visualizing the data 
-
-## Topographic variables
 
 ```{r}
-#Topographic variables 
-
-#Slope 
-
-#Aspect 
-
-#Heat load index 
-
-
-```
-
-
-
-
