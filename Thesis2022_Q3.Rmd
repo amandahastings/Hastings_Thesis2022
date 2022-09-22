@@ -40,6 +40,9 @@ ThesisSeedlings <- ThesisSeedlingsData %>%
   dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
   select_if(~!any(is.na(.)))
 
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))
 ```
 
 ## Terraclimate calculations 
@@ -114,10 +117,6 @@ ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
 ## Full data frame with terraclimate and thesis data
 
 ```{r}
-ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
-  arrange(PlotID)%>% 
-  mutate(forest_type = factor(forest_type))
-  
 # ThesisAll1[order(ThesisAll1$PlotID),]
 
 #### Still need to figure out duplicate rows and NAs
@@ -222,7 +221,6 @@ vegan:: stressplot(NMDS_Subalpine)
 
 
 ```{r}
-head(fortify(NMDS_LowerMontane.mds))
 
 ```
 
