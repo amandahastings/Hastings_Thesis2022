@@ -44,7 +44,9 @@ ThesisSeedlings <- ThesisSeedlingsData %>%
 ## Combining site data with seedlings data
 
 ```{r}
-ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID")
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))
 ```
 
 
