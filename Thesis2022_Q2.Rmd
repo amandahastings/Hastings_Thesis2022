@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Q2: How does post-fire vegetation cover vary between low and high severity within and across each forest type? 
 
-
 ```{r}
 #Read in data 
 ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
@@ -45,10 +44,12 @@ ThesisSeedlings <- ThesisSeedlingsData %>%
 ## Combining site data with seedlings data
 
 ```{r}
-ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID")
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))
 ```
 
-# Plant Cover Long Data
+# Plant cover long data
 
 ```{r}
 # Facet wrap plant cover data
@@ -64,4 +65,143 @@ PlantCoverLong <- ThesisAll1 %>%
     forest_type,
     levels = c("Lower Montane", "Upper Montane","Subalpine")))
 ```
+
+# Plant cover plot
+
+```{r}
+# Facet wrap by forest type - plant cover plot
+PlantCoverPlot <- ggplot(
+  PlantCoverLong,
+  aes(x = FunctionalGroup,
+      y = PercentPlantCover,
+      fill = burn_sev_category)
+) +
+  geom_boxplot() + ylim(0, 0.6) +
+  facet_wrap(~ forest_type) +
+  theme_classic() +
+  labs(x = "Functional Group",
+       y = "Percent Cover",
+       fill = "Burn Severity") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(1, "cm")) +
+  theme_few()+
+  scale_fill_manual(
+    name = "Burn Severity",
+    labels = c("Low", "High"), values=c("#fd8d3c","#bd0026"))+
+  theme(axis.text.x = element_text(
+    color = "black",
+    size = 9,
+    angle = 30,
+    vjust = .8,
+    hjust = .8
+  ),
+  axis.title.x=element_text(size=11), 
+    axis.title.y=element_text(size=11), 
+    axis.text.y = element_text(size=8), 
+    legend.title=element_text(size=11)) + 
+  scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))
+PlantCoverPlot 
+
+```
+
+# Graminoid ANOVA
+
+```{r,echo=FALSE}
+# # Graminoid ANOVA
+hist(ThesisAll1$gm_cover)
+LMFitGM <-
+  lm(gm_cover ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+anova(LMFitGM)
+par(mfrow = c(1, 2))
+plot(LMFitGM, which = 1:2)
+
+# Sqrt Graminoid ANOVA - Analysis used for presentation(s) 
+ThesisAll1$sqrtGM <- sqrt(ThesisAll1$gm_cover)
+hist(ThesisAll1$sqrtGM)
+LMFitsqrtGM <- lm(sqrt(gm_cover) ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+anova(LMFitsqrtGM)
+par(mfrow = c(1, 2))
+plot(LMFitsqrtGM, which = 1:2)
+
+# # log Graminoid ANOVA - not used
+# ThesisData$logGM <- log(ThesisData$gm_cover + 1)
+# hist(ThesisData$logGM)
+# LMFitLogGM <-
+#   lm(logGM ~ burn_sev_category * factor(forest_type), data = ThesisData)
+# anova(LMFitLogGM)
+# par(mfrow = c(1, 2))
+# plot(LMFitLogGM, which = 1:2)
+```
+
+# Pairwise comparison graminoid ANOVA
+
+```{r}
+#Tukey pairs Sqrt Graminoids
+#Differences by burn severity, but not forest type 
+emoutGM <- emmeans(LMFitsqrtGM, ~ burn_sev_category, transform="response")
+emoutGM
+pairs(emoutGM)
+cld(emoutGM)
+```
+
+# Back transform graminoids 
+
+```{r}
+backGM <- emmeans(LMFitsqrtGM, pairwise ~ burn_sev_category, transform = "response")
+backGM
+
+```
+
+# Forb ANOVA 
+
+```{r, echo=FALSE}
+# Forb ANOVA
+hist(ThesisAll1$fb_cover)
+LMFitFB <-
+  lm(fb_cover ~ burn_sev_category * forest_type, data = ThesisAll1)
+anova(LMFitFB)
+par(mfrow = c(1, 2))
+plot(LMFitFB, which = 1:2)
+
+# Sqrt Forb ANOVA - Analysis used for presentation(s)
+ThesisAll1$sqrtFB <- sqrt(ThesisData$fb_cover)
+hist(ThesisAll1$sqrtFB)
+LMFitsqrtFB <- lm(sqrtFB ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+anova(LMFitsqrtFB)
+par(mfrow = c(1, 2))
+plot(LMFitsqrtFB, which = 1:2)
+
+# # log Forb ANOVA - not used
+# ThesisData$logFB <- log(ThesisData$fb_cover + 1)
+# hist(ThesisData$logFB)
+```
+
+# Pairwise comparison forb ANOVA
+
+```{r}
+#Tukey pairs Sqrt Forbs 
+#Differences by forest type, but not burn severity 
+emoutFB <- emmeans(LMFitFB, ~ factor(forest_type))
+emoutFB
+pairs(emoutFB)
+cld(emoutFB)
+```
+
+# Back transform forbs (Assessing 9/22/22)
+
+```{r}
+backFB <- emmeans(LMFitsqrtFB, pairwise ~ factor(forest_type), transform = "response")
+backFB
+
+```
+
+
+
+
+
+
+
+
+
+
 
