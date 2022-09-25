@@ -180,11 +180,10 @@ z_NMDSdf_UpperMontane <- ThesisNMDSResponse %>%
       "PIEN" = z_PIEN_total)
 
 #Subalpine NMDS
-#Gotta figure this out 
 z_NMDSdf_Subalpine <- ThesisNMDSResponse %>% 
   filter(forest_type == "Subalpine")%>% 
   dplyr::select(!c(forest_type, QUGA_total, RONE_total, PIPO_total)) %>% 
-  mutate(.,~as.numeric(scale(.)), .names = 'z_{col}') %>%
+  mutate(across(where(is.numeric),~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   replace(is.na(.),0)%>%
   remove_rownames %>%
   column_to_rownames(var="PlotID")%>%
