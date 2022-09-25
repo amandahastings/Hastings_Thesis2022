@@ -117,10 +117,10 @@ ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
 ## Full data frame with terraclimate and thesis data
 
 ```{r}
-# ThesisAll1[order(ThesisAll1$PlotID),]
 
-#### Still need to figure out duplicate rows and NAs
-# ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
+
+#Still need to figure out duplicate rows and NAs
+ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
   
 ```
 
@@ -138,6 +138,7 @@ z_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
   dplyr::select(!c(forest_type, PIAR_total, ABLA_total, PIEN_total)) %>% 
   mutate(across(gm_cover:PIFL_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
   replace(is.na(.),0)%>% 
+  filter(!PlotID %in% 'LS02')%>%
   remove_rownames %>% 
   column_to_rownames(var="PlotID")%>% 
    rename(
@@ -152,7 +153,8 @@ z_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
       "PSME" = z_PSME_total,
       "ABCO" = z_ABCO_total,
       "PICO" = z_PICO_total,
-      "PIFL" = z_PIFL_total)
+      "PIFL" = z_PIFL_total)%>% 
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total))
   
 #Upper Montane NMDS  
 z_NMDSdf_UpperMontane <- ThesisNMDSResponse %>% 
@@ -177,7 +179,8 @@ z_NMDSdf_UpperMontane <- ThesisNMDSResponse %>%
       "PIFL" = z_PIFL_total,
       "PIAR" = z_PIAR_total,
       "ABLA" = z_ABLA_total,
-      "PIEN" = z_PIEN_total)
+      "PIEN" = z_PIEN_total)%>% 
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
 
 #Subalpine NMDS
 z_NMDSdf_Subalpine <- ThesisNMDSResponse %>% 
@@ -199,7 +202,8 @@ z_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
       "PIFL" = z_PIFL_total,
       "PIAR" = z_PIAR_total,
       "ABLA" = z_ABLA_total,
-      "PIEN" = z_PIEN_total)
+      "PIEN" = z_PIEN_total)%>% 
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
 
 
 #Standardize by zscore for each forest type 
