@@ -42,7 +42,8 @@ ThesisSeedlings <- ThesisSeedlingsData %>%
 
 ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
   arrange(PlotID)%>% 
-  mutate(forest_type = factor(forest_type))
+  mutate(forest_type = factor(forest_type))%>% 
+  mutate(burn_sev_category = factor(burn_sev_category))
 ```
 
 ## Terraclimate calculations 
@@ -246,62 +247,62 @@ OverlayPredictors1 <- ThesisAll1 %>%
   mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
   dplyr::select(!c(bg_cover:rk_cover))
 
-
 #Overlay Predictors Lower Montane 
-z_OverlayPred_LowerMontane <- OverlayPredictors1 %>% 
+OverlayPred_LowerMontane <- OverlayPredictors1 %>% 
   filter(forest_type == "Lower Montane")%>% 
+  filter(!PlotID %in% 'LS02')%>%
   dplyr::select(!forest_type) %>% 
-  mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
-  replace(is.na(.),0)%>%
+  # mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
+  # replace(is.na(.),0)%>%
   remove_rownames %>%
-  column_to_rownames(var="PlotID")%>%
-  rename("Elevation" = field.elevation..m.,
-         "Slope" = slope....,
-         "Aspect" = aspect_rescaled,
-         "Head Load Index" = heat_load,
-         "Canopy Cover" = z_canopy_cover,
-         "Adult Seed Source" = z_avg_seed_source,
-         "Conifer Seed Source" = z_conifer_seed_source,
-         "Barren Ground" = z_barren_cover,
-         "Organic Cover" = z_organic_cover)
+  column_to_rownames(var="PlotID")
+  # rename("Elevation" = field.elevation..m.,
+  #        "Slope" = slope....,
+  #        "Aspect" = aspect_rescaled,
+  #        "Head Load Index" = heat_load,
+  #        "Canopy Cover" = z_canopy_cover,
+  #        "Adult Seed Source" = z_avg_seed_source,
+  #        "Conifer Seed Source" = z_conifer_seed_source,
+  #        "Barren Ground" = z_barren_cover,
+  #        "Organic Cover" = z_organic_cover)
 
 
 #Overlay Predictors Lower Montane 
-z_OverlayPred_UpperMontane <- OverlayPredictors1 %>% 
+OverlayPred_UpperMontane <- OverlayPredictors1 %>% 
   filter(forest_type == "Upper Montane")%>% 
   dplyr::select(!forest_type) %>% 
-  mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
-  replace(is.na(.),0)%>%
+  # mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
+  # replace(is.na(.),0)%>%
   remove_rownames %>%
-  column_to_rownames(var="PlotID")%>%
-  rename("Elevation" = field.elevation..m.,
-         "Slope" = slope....,
-         "Aspect" = aspect_rescaled,
-         "Head Load Index" = heat_load,
-         "Canopy Cover" = z_canopy_cover,
-         "Adult Seed Source" = z_avg_seed_source,
-         "Conifer Seed Source" = z_conifer_seed_source,
-         "Barren Ground" = z_barren_cover,
-         "Organic Cover" = z_organic_cover)
+  column_to_rownames(var="PlotID")
+  # rename("Elevation" = field.elevation..m.,
+  #        "Slope" = slope....,
+  #        "Aspect" = aspect_rescaled,
+  #        "Head Load Index" = heat_load,
+  #        "Canopy Cover" = z_canopy_cover,
+  #        "Adult Seed Source" = z_avg_seed_source,
+  #        "Conifer Seed Source" = z_conifer_seed_source,
+  #        "Barren Ground" = z_barren_cover,
+  #        "Organic Cover" = z_organic_cover)
 
 
 
 #Overlay Predictors Lower Montane 
-z_OverlayPred_Subalpine <- OverlayPredictors1 %>% 
+OverlayPred_Subalpine <- OverlayPredictors1 %>% 
   filter(forest_type == "Subalpine")%>% 
-  dplyr::select(!forest_type) %>% 
-  mutate(across(avg_seed_source:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
-  replace(is.na(.),0)%>%
+  dplyr::select(!c(forest_type, canopy_cover)) %>% 
+  # mutate(across(avg_seed_source:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
+  # replace(is.na(.),0)%>%
   remove_rownames %>%
-  column_to_rownames(var="PlotID")%>%
-  rename("Elevation" = field.elevation..m.,
-         "Slope" = slope....,
-         "Aspect" = aspect_rescaled,
-         "Head Load Index" = heat_load,
-         "Adult Seed Source" = z_avg_seed_source,
-         "Conifer Seed Source" = z_conifer_seed_source,
-         "Barren Ground" = z_barren_cover,
-         "Organic Cover" = z_organic_cover)
+  column_to_rownames(var="PlotID")
+  # rename("Elevation" = field.elevation..m.,
+  #        "Slope" = slope....,
+  #        "Aspect" = aspect_rescaled,
+  #        "Head Load Index" = heat_load,
+  #        "Adult Seed Source" = z_avg_seed_source,
+  #        "Conifer Seed Source" = z_conifer_seed_source,
+  #        "Barren Ground" = z_barren_cover,
+  #        "Organic Cover" = z_organic_cover)
 
 ```
 
@@ -342,11 +343,29 @@ vegan:: stressplot(NMDS_Subalpine)
 
 ```{r}
 #Attempts to plot with ggvegan
-autoplot(NMDS_LowerMontane)
-str(NMDS_LowerMontane)
+# autoplot(NMDS_LowerMontane)
+
 
 ```
 
+## Fit environmental variables 
 
+```{r}
+
+#Lower Montane env fit 
+EnvFit_LowerMontane <- envfit(NMDS_LowerMontane, OverlayPred_LowerMontane)
+plot(EnvFit_LowerMontane, p.max = 0.05)
+EnvFit_LowerMontane
+
+#Upper Montane env fit 
+EnvFit_UpperMontane <- envfit(NMDS_UpperMontane, OverlayPred_UpperMontane)
+# plot(EnvFit_UpperMontane)
+EnvFit_UpperMontane
+
+#Subalpine env fit 
+EnvFit_Subalpine <- envfit(NMDS_Subalpine, OverlayPred_Subalpine)
+# plot(EnvFit_Subalpine)
+EnvFit_Subalpine
+```
 
 
