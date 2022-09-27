@@ -124,7 +124,7 @@ ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", al
   
 ```
 
-## NMDS response data frame 
+## NMDS response data frames 
 
 ```{r}
 
@@ -154,7 +154,7 @@ z_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
       "ABCO" = z_ABCO_total,
       "PICO" = z_PICO_total,
       "PIFL" = z_PIFL_total)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total))
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total))
   
 #Upper Montane NMDS  
 z_NMDSdf_UpperMontane <- ThesisNMDSResponse %>% 
@@ -180,7 +180,7 @@ z_NMDSdf_UpperMontane <- ThesisNMDSResponse %>%
       "PIAR" = z_PIAR_total,
       "ABLA" = z_ABLA_total,
       "PIEN" = z_PIEN_total)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
 
 #Subalpine NMDS
 z_NMDSdf_Subalpine <- ThesisNMDSResponse %>% 
@@ -203,8 +203,7 @@ z_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
       "PIAR" = z_PIAR_total,
       "ABLA" = z_ABLA_total,
       "PIEN" = z_PIEN_total)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, POTR_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
-
+  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
 
 #Standardize by zscore for each forest type 
 # z_NMDSResponse <- ThesisNMDSResponse %>% 
@@ -236,23 +235,78 @@ z_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 
 ```
 
-## Overlay predictors data frame 
+## Overlay predictors data frames 
 
 ```{r}
 #OVerlay predictors data frame 
 OverlayPredictors1 <- ThesisAll1 %>% 
-  dplyr::select(property, burn_sev_category, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
   rowwise()%>%
   mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
-  mutate(organic_cover = sum(c(lt_cover,wd_cover)))
+  mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
+  dplyr::select(!c(bg_cover:rk_cover))
 
-# z_OverlayPredictors <- OverlayPredictors1
-#   mutate(across)
+
+#Overlay Predictors Lower Montane 
+z_OverlayPred_LowerMontane <- OverlayPredictors1 %>% 
+  filter(forest_type == "Lower Montane")%>% 
+  dplyr::select(!forest_type) %>% 
+  mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
+  replace(is.na(.),0)%>%
+  remove_rownames %>%
+  column_to_rownames(var="PlotID")%>%
+  rename("Elevation" = field.elevation..m.,
+         "Slope" = slope....,
+         "Aspect" = aspect_rescaled,
+         "Head Load Index" = heat_load,
+         "Canopy Cover" = z_canopy_cover,
+         "Adult Seed Source" = z_avg_seed_source,
+         "Conifer Seed Source" = z_conifer_seed_source,
+         "Barren Ground" = z_barren_cover,
+         "Organic Cover" = z_organic_cover)
+
+
+#Overlay Predictors Lower Montane 
+z_OverlayPred_UpperMontane <- OverlayPredictors1 %>% 
+  filter(forest_type == "Upper Montane")%>% 
+  dplyr::select(!forest_type) %>% 
+  mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
+  replace(is.na(.),0)%>%
+  remove_rownames %>%
+  column_to_rownames(var="PlotID")%>%
+  rename("Elevation" = field.elevation..m.,
+         "Slope" = slope....,
+         "Aspect" = aspect_rescaled,
+         "Head Load Index" = heat_load,
+         "Canopy Cover" = z_canopy_cover,
+         "Adult Seed Source" = z_avg_seed_source,
+         "Conifer Seed Source" = z_conifer_seed_source,
+         "Barren Ground" = z_barren_cover,
+         "Organic Cover" = z_organic_cover)
+
+
+
+#Overlay Predictors Lower Montane 
+z_OverlayPred_Subalpine <- OverlayPredictors1 %>% 
+  filter(forest_type == "Subalpine")%>% 
+  dplyr::select(!forest_type) %>% 
+  mutate(across(avg_seed_source:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
+  replace(is.na(.),0)%>%
+  remove_rownames %>%
+  column_to_rownames(var="PlotID")%>%
+  rename("Elevation" = field.elevation..m.,
+         "Slope" = slope....,
+         "Aspect" = aspect_rescaled,
+         "Head Load Index" = heat_load,
+         "Adult Seed Source" = z_avg_seed_source,
+         "Conifer Seed Source" = z_conifer_seed_source,
+         "Barren Ground" = z_barren_cover,
+         "Organic Cover" = z_organic_cover)
 
 ```
 
 
-## Attempts at NMDS 
+## NMDS objects
 
 ```{r}
 library(vegan)
@@ -264,6 +318,11 @@ NMDS_LowerMontane <- metaMDS(z_NMDSdf_LowerMontane, distance = "euclidean", auto
 ordiplot(NMDS_LowerMontane, type="t", main = "Lower Montane")
 str(NMDS_LowerMontane)
 vegan:: stressplot(NMDS_LowerMontane)
+
+# plot(NMDS_LowerMontane, type = "n")
+# points(NMDS_LowerMontane, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")
+# text(NMDS_LowerMontane, display = "spec", cex=0.7, col="blue")
+
 
 #NMDS Upper Montane 
 NMDS_UpperMontane <- metaMDS(z_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F)
@@ -279,8 +338,12 @@ vegan:: stressplot(NMDS_Subalpine)
 
 ```
 
+## Attempts to plot with ggvegan
 
 ```{r}
+#Attempts to plot with ggvegan
+autoplot(NMDS_LowerMontane)
+str(NMDS_LowerMontane)
 
 ```
 
