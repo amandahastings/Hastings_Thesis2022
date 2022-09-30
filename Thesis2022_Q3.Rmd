@@ -3,6 +3,8 @@ title: "Thesis2022_Q3"
 author: "Amanda Hastings"
 date: "2022-09-08"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -433,7 +435,7 @@ EnvFit_Subalpine
 
 ## Lower Montane plot 
 
-```{r}
+```{r, fig.width = 5, fig.height = 4.5}
 #Fortified ordination - Lower Montane
 fort_LowerMontane <- fortify(NMDS_LowerMontane)
 
@@ -446,6 +448,7 @@ ggplot() +
     colour = "black",
     alpha = 0.5
   ) +
+  labs(title = "Lower Montane")+
   geom_text( 
     data = subset(fort_LowerMontane, Score == 'species', check_overlap = T),
     #Pushes label away from the arrow
@@ -478,7 +481,7 @@ ggplot() +
 
 ## Upper Montane plot 
 
-```{r}
+```{r, fig.width = 5, fig.height = 4.5}
 #Fortified ordination - Upper Montane
 fort_UpperMontane <- fortify(NMDS_UpperMontane)
 
@@ -491,6 +494,7 @@ ggplot() +
     colour = "black",
     alpha = 0.5
   ) +
+  labs(title = "Upper Montane")+
   geom_text( 
     data = subset(fort_UpperMontane, Score == 'species', check_overlap = T),
     #Pushes label away from the arrow
@@ -523,7 +527,7 @@ ggplot() +
 
 ## Subalpine plot 
 
-```{r}
+```{r, fig.width = 5, fig.height = 4.5}
 #Fortified ordination - Subalpine
 fort_Subalpine <- fortify(NMDS_Subalpine)
 
@@ -536,6 +540,7 @@ ggplot() +
     colour = "black",
     alpha = 0.5
   ) +
+  labs(title = "Subalpine")+
   geom_text( 
     data = subset(fort_Subalpine, Score == 'species', check_overlap = T),
     #Pushes label away from the arrow
