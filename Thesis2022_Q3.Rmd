@@ -154,7 +154,7 @@ max_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
     "PICO" = PICO_total
   )
   
-#Upper Montane zscore data frame 
+#Upper Montane max relative data frame 
 max_NMDSdf_UpperMontane <- ThesisNMDSResponse %>% 
   filter(forest_type == "Upper Montane") %>%
   dplyr::select(!c(forest_type, RONE_total, PIPO_total, ABCO_total)) %>% 
@@ -174,7 +174,7 @@ max_NMDSdf_UpperMontane <- ThesisNMDSResponse %>%
     "PIFL" = PIFL_total
   ) 
 
-#Subalpine zscore data frame
+#Subalpine max relative df
 max_NMDSdf_Subalpine <- ThesisNMDSResponse %>% 
   filter(forest_type == "Subalpine")%>% 
   dplyr::select(-forest_type, -QUGA_total:-PIPO_total, -ABCO_total, -ABLA_total:-PIEN_total)%>%
