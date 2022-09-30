@@ -134,7 +134,7 @@ ThesisNMDSResponse <- ThesisAll1 %>%
 #Lower Montane max relative df
 max_NMDSdf_LowerMontane <- ThesisNMDSResponse %>% 
   filter(forest_type == "Lower Montane")%>%
-  # filter(!PlotID %in% 'LS02')%>%
+  filter(!PlotID %in% 'LS02')%>%
   dplyr::select(!c(forest_type, PIPO_total)) %>% 
   dplyr::select(-PIFL_total:-PIEN_total) %>%
   remove_rownames %>% 
@@ -383,18 +383,16 @@ vegan:: stressplot(NMDS_LowerMontane)
 
 
 #NMDS Upper Montane 
-NMDS_UpperMontane <- metaMDS(max_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F)
+NMDS_UpperMontane <- metaMDS(max_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F, wascores = T)
 ordiplot(NMDS_UpperMontane, type = 't', main = "Upper Montane")
 str(NMDS_UpperMontane)
 vegan:: stressplot(NMDS_UpperMontane)
 
 #NMDS Subalpine 
-NMDS_Subalpine <- metaMDS(max_NMDSdf_Subalpine, distance = "euclidean", k=2, autotransform = F)
+NMDS_Subalpine <- metaMDS(max_NMDSdf_Subalpine, distance = "euclidean", k=2, autotransform = F, wascores = T)
 ordiplot(NMDS_Subalpine, type = 't', main = "Subalpine")
 str(NMDS_Subalpine)
 vegan:: stressplot(NMDS_Subalpine)
-
-NMDS_LowerMontane
 
 ```
 
@@ -403,6 +401,10 @@ NMDS_LowerMontane
 ```{r}
 #Attempts to plot with ggvegan
 autoplot(NMDS_LowerMontane)
+
+autoplot(NMDS_UpperMontane)
+
+autoplot(NMDS_Subalpine)
 
 
 ```
