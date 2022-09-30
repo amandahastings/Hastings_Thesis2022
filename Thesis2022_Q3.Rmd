@@ -123,6 +123,7 @@ ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", al
   
 ```
 
+
 ## NMDS response data frames relativized by maximum value
 
 ```{r}
@@ -130,78 +131,66 @@ ThesisNMDSResponse <- ThesisAll1 %>%
   dplyr::select(PlotID, forest_type, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
   mutate_at(vars(PIPO_total,ABLA_total,PIEN_total), as.numeric)
 
-#Lower Montane NMDS
-z_NMDSdf_LowerMontane <- ThesisNMDSResponse %>% 
-  filter(forest_type == "Lower Montane")%>% 
-  dplyr::select(!c(forest_type, PIAR_total, ABLA_total, PIEN_total)) %>% 
-  mutate(across(gm_cover:PIFL_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
-  replace(is.na(.),0)%>% 
-  filter(!PlotID %in% 'LS02')%>%
+#Lower Montane max relative df
+max_NMDSdf_LowerMontane <- ThesisNMDSResponse %>% 
+  filter(forest_type == "Lower Montane")%>%
+  # filter(!PlotID %in% 'LS02')%>%
+  dplyr::select(!c(forest_type, PIPO_total)) %>% 
+  dplyr::select(-PIFL_total:-PIEN_total) %>%
   remove_rownames %>% 
-  column_to_rownames(var="PlotID")%>% 
-   rename(
-      "Graminoids" = z_gm_cover,
-      "Forbs" = z_fb_cover,
-      "Shrubs" = z_sh_cover,
-      "Seedlings" = z_tr_cover,
-      "POTR" = z_POTR_total,
-      "QUGA" = z_QUGA_total,
-      "RONE" = z_RONE_total,
-      # "PIPO" = z_PIPO_total,
-      "PSME" = z_PSME_total,
-      "ABCO" = z_ABCO_total,
-      "PICO" = z_PICO_total)%>%
-      # "PIFL" = z_PIFL_total) 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, z_PIPO_total,z_PIFL_total))
+  column_to_rownames(var="PlotID") %>% 
+  decostand(., method = "max") %>% 
+  dplyr::select(-tr_cover)%>% 
+  rename(
+    "Graminoids" = gm_cover,
+    "Forbs" = fb_cover,
+    "Shrubs" = sh_cover,
+    "POTR" = POTR_total,
+    "QUGA" = QUGA_total,
+    "RONE" = RONE_total,
+    "PSME" = PSME_total,
+    "ABCO" = ABCO_total,
+    "PICO" = PICO_total
+  )
   
-#Upper Montane NMDS  
-z_NMDSdf_UpperMontane <- ThesisNMDSResponse %>% 
-  filter(forest_type == "Upper Montane")%>% 
-  dplyr::select(!c(forest_type)) %>% 
-  mutate(across(gm_cover:PIEN_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
-  replace(is.na(.),0)%>% 
+#Upper Montane zscore data frame 
+max_NMDSdf_UpperMontane <- ThesisNMDSResponse %>% 
+  filter(forest_type == "Upper Montane") %>%
+  dplyr::select(!c(forest_type, RONE_total, PIPO_total, ABCO_total)) %>% 
+  dplyr::select(-PIAR_total:-PIEN_total) %>%
   remove_rownames %>% 
-  column_to_rownames(var="PlotID")%>% 
-   rename(
-      "Graminoids" = z_gm_cover,
-      "Forbs" = z_fb_cover,
-      "Shrubs" = z_sh_cover,
-      "Seedlings" = z_tr_cover,
-      "POTR" = z_POTR_total,
-      "QUGA" = z_QUGA_total,
-      "RONE" = z_RONE_total,
-      "PIPO" = z_PIPO_total,
-      "PSME" = z_PSME_total,
-      "ABCO" = z_ABCO_total,
-      "PICO" = z_PICO_total,
-      "PIFL" = z_PIFL_total,
-      "PIAR" = z_PIAR_total,
-      "ABLA" = z_ABLA_total,
-      "PIEN" = z_PIEN_total)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
+  column_to_rownames(var="PlotID") %>%
+  decostand(., method = "max") %>% 
+  dplyr::select(-tr_cover)%>% 
+  rename(
+    "Graminoids" = gm_cover,
+    "Forbs" = fb_cover,
+    "Shrubs" = sh_cover,
+    "POTR" = POTR_total,
+    "QUGA" = QUGA_total,
+    "PSME" = PSME_total,
+    "PICO" = PICO_total,
+    "PIFL" = PIFL_total
+  ) 
 
-#Subalpine NMDS
-z_NMDSdf_Subalpine <- ThesisNMDSResponse %>% 
+#Subalpine zscore data frame
+max_NMDSdf_Subalpine <- ThesisNMDSResponse %>% 
   filter(forest_type == "Subalpine")%>% 
-  dplyr::select(!c(forest_type, QUGA_total, RONE_total, PIPO_total)) %>% 
-  mutate(across(where(is.numeric),~as.numeric(scale(.)), .names = 'z_{col}')) %>%
-  replace(is.na(.),0)%>%
+  dplyr::select(-forest_type, -QUGA_total:-PIPO_total, -ABCO_total, -ABLA_total:-PIEN_total)%>%
   remove_rownames %>%
-  column_to_rownames(var="PlotID")%>%
-   rename(
-      "Graminoids" = z_gm_cover,
-      "Forbs" = z_fb_cover,
-      "Shrubs" = z_sh_cover,
-      "Seedlings" = z_tr_cover,
-      "POTR" = z_POTR_total,
-      "PSME" = z_PSME_total,
-      "ABCO" = z_ABCO_total,
-      "PICO" = z_PICO_total,
-      "PIFL" = z_PIFL_total,
-      "PIAR" = z_PIAR_total,
-      "ABLA" = z_ABLA_total,
-      "PIEN" = z_PIEN_total)%>% 
-  dplyr::select(!c(gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total))
+  column_to_rownames(var="PlotID")%>% 
+  decostand(., method = "max") %>%
+  dplyr::select(-tr_cover)%>% 
+  rename(
+    "Graminoids" = gm_cover,
+    "Forbs" = fb_cover,
+    "Shrubs" = sh_cover,
+    "POTR" = POTR_total,
+    "PSME" = PSME_total,
+    "PICO" = PICO_total,
+    "PIFL" = PIFL_total,
+    "PIAR" = PIAR_total
+  )
 ```
 
 
@@ -211,14 +200,14 @@ z_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 #Lower Montane zscore data frame
 z_NMDSdf_LowerMontane <- ThesisNMDSResponse %>% 
   filter(forest_type == "Lower Montane")%>% 
+  filter(!PlotID %in% 'LS02')%>%
   dplyr::select(!c(forest_type, PIAR_total, ABLA_total, PIEN_total)) %>% 
   mutate(across(gm_cover:PIFL_total, ~as.numeric(scale(.)), .names = 'z_{col}'))%>% 
   replace(is.na(.),0)%>% 
-  filter(!PlotID %in% 'LS02')%>%
   remove_rownames %>% 
   column_to_rownames(var="PlotID")%>% 
   dplyr::select(!c(gm_cover:PIFL_total))%>% 
-  dplyr::select(!c(z_PIPO_total,z_PIFL_total, z_tr_cover))%>% 
+  dplyr::select(!c(z_PIPO_total,z_ABCO_total, z_PIFL_total, z_tr_cover))%>% 
   rename(
     "Graminoids" = z_gm_cover,
     "Forbs" = z_fb_cover,
@@ -227,7 +216,6 @@ z_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
     "QUGA" = z_QUGA_total,
     "RONE" = z_RONE_total,
     "PSME" = z_PSME_total,
-    "ABCO" = z_ABCO_total,
     "PICO" = z_PICO_total,
   ) 
   
