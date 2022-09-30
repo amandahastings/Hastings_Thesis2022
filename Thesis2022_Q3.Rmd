@@ -26,6 +26,7 @@ library(RColorBrewer)
 library(emmeans)
 library(multcomp)
 library(multcompView)
+library(ggthemes)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -136,7 +137,7 @@ max_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
   filter(forest_type == "Lower Montane")%>%
   filter(!PlotID %in% 'LS02')%>%
   dplyr::select(!c(forest_type, PIPO_total)) %>% 
-  dplyr::select(-PIFL_total:-PIEN_total) %>%
+  dplyr::select(-ABCO_total, -PIFL_total:-PIEN_total) %>%
   remove_rownames %>% 
   column_to_rownames(var="PlotID") %>% 
   decostand(., method = "max") %>% 
@@ -149,7 +150,7 @@ max_NMDSdf_LowerMontane <- ThesisNMDSResponse %>%
     "QUGA" = QUGA_total,
     "RONE" = RONE_total,
     "PSME" = PSME_total,
-    "ABCO" = ABCO_total,
+    # "ABCO" = ABCO_total,
     "PICO" = PICO_total
   )
   
@@ -396,7 +397,7 @@ vegan:: stressplot(NMDS_Subalpine)
 
 ```
 
-## Attempts to plot with ggvegan
+## Plots with ggvegan autoplot()
 
 ```{r}
 #Attempts to plot with ggvegan
@@ -405,7 +406,6 @@ autoplot(NMDS_LowerMontane)
 autoplot(NMDS_UpperMontane)
 
 autoplot(NMDS_Subalpine)
-
 
 ```
 
@@ -429,21 +429,146 @@ EnvFit_Subalpine <- envfit(NMDS_Subalpine, OverlayPred_Subalpine)
 EnvFit_Subalpine
 ```
 
+## Plots using ggvegan 
 
-# Monique code
+## Lower Montane plot 
 
 ```{r}
+#Fortified ordination - Lower Montane
+fort_LowerMontane <- fortify(NMDS_LowerMontane)
 
-# #relativize by row total (i.e. convert to percentage composition)
-# spp13_rowsums <- rowSums(seki_spp13)
-# seki_spp13_relrow <- seki_spp13/spp13_rowsums
-# head(seki_spp13_relrow)
-# 
-# 
-# #relativize by column maximum (downweight abundant species)
-# spp13_colmax<-sapply(seki_spp13,max)
-# seki_spp13_relcolmax <- sweep(seki_spp13,2,spp13_colmax,'/')
-# head(seki_spp13_relcolmax)
+
+#Lower Montane plot
+ggplot() +
+  geom_point(
+    data = subset(fort_LowerMontane, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2),
+    colour = "black",
+    alpha = 0.5
+  ) +
+  geom_text( 
+    data = subset(fort_LowerMontane, Score == 'species', check_overlap = T),
+    #Pushes label away from the arrow
+    mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+    
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 11)
+  )
 ```
+
+## Upper Montane plot 
+
+```{r}
+#Fortified ordination - Upper Montane
+fort_UpperMontane <- fortify(NMDS_UpperMontane)
+
+
+#Upper Montane plot
+ggplot() +
+  geom_point(
+    data = subset(fort_UpperMontane, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2),
+    colour = "black",
+    alpha = 0.5
+  ) +
+  geom_text( 
+    data = subset(fort_UpperMontane, Score == 'species', check_overlap = T),
+    #Pushes label away from the arrow
+    mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+    
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 11)
+  )
+```
+
+## Subalpine plot 
+
+```{r}
+#Fortified ordination - Subalpine
+fort_Subalpine <- fortify(NMDS_Subalpine)
+
+
+#Subalpine plot
+ggplot() +
+  geom_point(
+    data = subset(fort_Subalpine, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2),
+    colour = "black",
+    alpha = 0.5
+  ) +
+  geom_text( 
+    data = subset(fort_Subalpine, Score == 'species', check_overlap = T),
+    #Pushes label away from the arrow
+    mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+    
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 11)
+  )
+```
+
+
+
+
+
 
 
