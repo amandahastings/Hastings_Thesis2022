@@ -579,7 +579,8 @@ ggplot() +
     axis.text.y = element_text(size = 8),
     legend.title = element_blank(), 
     legend.text = element_text(size=8)
-  ) 
+  ) + 
+  labs(x="NMDS1", y= "NMDS2")
     
 ```
 
@@ -659,7 +660,8 @@ ggplot() +
     axis.text.y = element_text(size = 8),
     legend.title = element_blank(), 
     legend.text = element_text(size=8)
-  )
+  ) + 
+  labs(x="NMDS1", y= "NMDS2")
 ```
 
 ## Subalpine plot 
@@ -668,7 +670,17 @@ ggplot() +
 #Fortified ordination - Subalpine
 fort_Subalpine <- fortify(NMDS_Subalpine)
 
+#Grab lower montane fire severity 
+SubalpineSeverity <- ThesisData %>% 
+  filter(forest_type == "Subalpine")%>% 
+   dplyr::select(PlotID,burn_sev_category)
 
+#Fortified data frame plus burn severity to plot - Lower Montane 
+fort.plot_Subalpine <- merge(fort_Subalpine, SubalpineSeverity, by.x = "Label", by.y = "PlotID", all = T)
+```
+
+
+```{r}
 #Subalpine plot
 ggplot() +
   geom_segment(
@@ -701,8 +713,8 @@ ggplot() +
     colour = "gray"
   ) +
   geom_point(
-    data = subset(fort_Subalpine, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2),
+    data = subset(fort.plot_Subalpine, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category), size=2,
     colour = "black",
     alpha = 0.5
   ) +
@@ -725,7 +737,8 @@ ggplot() +
     axis.text.y = element_text(size = 8),
     legend.title = element_blank(),
     legend.text = element_text(size=8)
-  )
+  ) + 
+  labs(x="NMDS1", y= "NMDS2")
 ```
 
 
