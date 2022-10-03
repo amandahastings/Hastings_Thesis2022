@@ -4,7 +4,7 @@ author: "Amanda Hastings"
 date: "2022-09-08"
 output: html_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -564,8 +564,10 @@ ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_text(size = 11)
-  )
+    legend.title = element_blank(), 
+    legend.text = element_text(size=8)
+  ) 
+    
 ```
 
 
@@ -630,7 +632,8 @@ ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_text(size = 11)
+    legend.title = element_blank(), 
+    legend.text = element_text(size=8)
   )
 ```
 
@@ -695,7 +698,8 @@ ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_text(size = 11)
+    legend.title = element_blank(),
+    legend.text = element_text(size=8)
   )
 ```
 
