@@ -29,6 +29,9 @@ library(emmeans)
 library(multcomp)
 library(multcompView)
 library(ggthemes)
+library(vegan)
+library(ggvegan)
+library(ggpubr)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -370,9 +373,6 @@ OverlayPred_Subalpine <- OverlayPredictors1 %>%
 ## NMDS objects
 
 ```{r}
-library(vegan)
-library(ggvegan)
-library(ggpubr)
 
 #NMDS Lower Montane 
 NMDS_LowerMontane <- metaMDS(max_NMDSdf_LowerMontane, distance = "euclidean", autotransform = F, wascores=T)
@@ -504,6 +504,19 @@ Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>%
 #Fortified ordination - Lower Montane
 fort_LowerMontane <- fortify(NMDS_LowerMontane)
 
+#Grab lower montane fire severity 
+LowerMontaneSeverity <- ThesisData %>% 
+  filter(forest_type == "Lower Montane")%>% 
+   filter(!PlotID %in% 'LS02')%>%
+   dplyr::select(PlotID,burn_sev_category)
+
+#Fortified data frame plus burn severity to plot - Lower Montane 
+fort.plot_LowerMontane <- merge(fort_LowerMontane, LowerMontaneSeverity, by.x = "Label", by.y = "PlotID", all = T)
+  
+```
+
+
+```{r}
 library(ggrepel)
 
 #Lower Montane plot
@@ -537,8 +550,8 @@ ggplot() +
     colour = "gray"
   ) +
   geom_point(
-    data = subset(fort_LowerMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2),
+    data = subset(fort.plot_LowerMontane, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category), size=2,
     colour = "black",
     alpha = 0.5
   ) +
@@ -578,6 +591,18 @@ ggplot() +
 #Fortified ordination - Upper Montane
 fort_UpperMontane <- fortify(NMDS_UpperMontane)
 
+#Grab lower montane fire severity 
+UpperMontaneSeverity <- ThesisData %>% 
+  filter(forest_type == "Upper Montane")%>% 
+   dplyr::select(PlotID,burn_sev_category)
+
+#Fortified data frame plus burn severity to plot - Lower Montane 
+fort.plot_UpperMontane <- merge(fort_UpperMontane, UpperMontaneSeverity, by.x = "Label", by.y = "PlotID", all = T)
+  
+```
+
+
+```{r}
 
 #Upper Montane plot
 ggplot() +
@@ -610,8 +635,8 @@ ggplot() +
     colour = "gray"
   ) +
   geom_point(
-    data = subset(fort_UpperMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2),
+    data = subset(fort.plot_UpperMontane, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category), size=2,
     colour = "black",
     alpha = 0.5
   ) +
