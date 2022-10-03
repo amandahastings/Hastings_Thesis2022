@@ -32,6 +32,7 @@ library(ggthemes)
 library(vegan)
 library(ggvegan)
 library(ggpubr)
+library(viridis)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -533,6 +534,7 @@ ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
+  scale_color_viridis(discrete = TRUE, option="plasma")+
   # geom_text(data = LowerMontane.env.scoresdf, aes(x=0,y=0, label = str_wrap(EnvPred)))+
   geom_abline(
     #Horizontal line through origin
@@ -619,6 +621,7 @@ ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
+  scale_color_viridis(discrete = TRUE, option="plasma")+
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -695,6 +698,7 @@ ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
+  scale_color_viridis(discrete = TRUE, option="plasma")+
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
