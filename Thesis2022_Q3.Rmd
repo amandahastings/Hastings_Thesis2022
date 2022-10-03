@@ -439,8 +439,15 @@ EnvFit_Subalpine
 #Lower Montane EnvFit df for plotting
 LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "sites"))
 
+
+# Burn severity as factor 
+LowerMontane.env.scores1 <- as.data.frame(scores(EnvFit_LowerMontane, display = "factors"))
+LowerMontane.env.scores1 <- cbind(LowerMontane.env.scores1, EnvPred = rownames(LowerMontane.env.scores1))
+
 LowerMontane.env.scoresdf <- as.data.frame(scores(EnvFit_LowerMontane, display = "vectors"))
 LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
+
+LowerMontane.env.scoresdf <- rbind(LowerMontane.env.scoresdf, LowerMontane.env.scores1)
 
 LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>% 
   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
@@ -448,7 +455,9 @@ LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>%
                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
                                 EnvPred == "total_ba" ~ "Total Basal Area", 
-                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>%
+  filter(!is.na(EnvPred2))
          
 #Upper Montane EnvFit df for plotting
 UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
@@ -462,7 +471,10 @@ UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>%
                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
                                 EnvPred == "total_ba" ~ "Total Basal Area", 
-                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>% 
+  filter(!is.na(EnvPred2))
+  
          
 
 
@@ -478,7 +490,10 @@ Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>%
                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
                                 EnvPred == "total_ba" ~ "Total Basal Area", 
-                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>% 
+  filter(!is.na(EnvPred2))
+  
          
 ```
 
