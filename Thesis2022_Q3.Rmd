@@ -4,7 +4,7 @@ author: "Amanda Hastings"
 date: "2022-09-08"
 output: html_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -433,12 +433,37 @@ EnvFit_Subalpine
 
 ## Plots using ggvegan 
 
+## Fitting env fit vectors to plot  
+
+```{r}
+#Lower Montane EnvFit df for plotting
+LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "sites"))
+
+LowerMontane.env.scoresdf <- as.data.frame(scores(EnvFit_LowerMontane, display = "vectors"))
+LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
+
+#Upper Montane EnvFit df for plotting
+UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
+
+UpperMontane.env.scoresdf <- as.data.frame(scores(EnvFit_UpperMontane, display = "vectors"))
+UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
+
+
+#Subalpine EnvFit df for plotting
+Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
+
+Subalpine.env.scoresdf <- as.data.frame(scores(EnvFit_Subalpine, display = "vectors"))
+Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
+```
+
+
 ## Lower Montane plot 
 
-```{r, fig.width = 5, fig.height = 4.5}
+```{r}
 #Fortified ordination - Lower Montane
 fort_LowerMontane <- fortify(NMDS_LowerMontane)
 
+library(ggrepel)
 
 #Lower Montane plot
 ggplot() +
@@ -448,11 +473,26 @@ ggplot() +
     colour = "black",
     alpha = 0.5
   ) +
-  labs(title = "Lower Montane")+
-  geom_text( 
+  # geom_text(
+  #   data = subset(fort_LowerMontane, Score == "sites"),size = 3,
+  #   mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1)
+  # ) +
+  # ^Adds labels for sites 
+  labs(title = "Lower Montane") +
+  geom_text(
     data = subset(fort_LowerMontane, Score == 'species', check_overlap = T),
+    size = 3.25,
     #Pushes label away from the arrow
-    mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
+    mapping = aes(
+      label = Label,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
+  ) +
+  geom_segment(data = LowerMontane.env.scoresdf, aes(x = 0, xend = NMDS1, y=0, yend = NMDS2, colour = EnvPred),
+               arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75)+ 
+  # geom_text(data = LowerMontane.env.scoresdf, aes(x=0,y=0, label = str_wrap(EnvPred)))+
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -460,7 +500,6 @@ ggplot() +
     linetype = "dashed",
     size = 0.5,
     colour = "gray"
-    
   ) +
   geom_vline(
     #Vertical line through origin
@@ -479,9 +518,11 @@ ggplot() +
   )
 ```
 
+
+
 ## Upper Montane plot 
 
-```{r, fig.width = 5, fig.height = 4.5}
+```{r}
 #Fortified ordination - Upper Montane
 fort_UpperMontane <- fortify(NMDS_UpperMontane)
 
@@ -496,9 +537,12 @@ ggplot() +
   ) +
   labs(title = "Upper Montane")+
   geom_text( 
-    data = subset(fort_UpperMontane, Score == 'species', check_overlap = T),
+    data = subset(fort_UpperMontane, Score == 'species', check_overlap = T), size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
+  geom_segment(data = UpperMontane.env.scoresdf, aes(x = 0, xend = NMDS1, y=0, yend = NMDS2, colour = EnvPred),
+               arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75)+ 
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -527,7 +571,7 @@ ggplot() +
 
 ## Subalpine plot 
 
-```{r, fig.width = 5, fig.height = 4.5}
+```{r}
 #Fortified ordination - Subalpine
 fort_Subalpine <- fortify(NMDS_Subalpine)
 
@@ -542,7 +586,7 @@ ggplot() +
   ) +
   labs(title = "Subalpine")+
   geom_text( 
-    data = subset(fort_Subalpine, Score == 'species', check_overlap = T),
+    data = subset(fort_Subalpine, Score == 'species', check_overlap = T), size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
   geom_abline(
@@ -554,6 +598,9 @@ ggplot() +
     colour = "gray"
     
   ) +
+  geom_segment(data = Subalpine.env.scoresdf, aes(x = 0, xend = NMDS1, y=0, yend = NMDS2, colour = EnvPred),
+               arrow = arrow(length = unit(0.025, "npc")), 
+    size = 0.75)+ 
   geom_vline(
     #Vertical line through origin
     aes(xintercept = 0),
