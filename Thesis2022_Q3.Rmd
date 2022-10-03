@@ -442,11 +442,28 @@ LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "s
 LowerMontane.env.scoresdf <- as.data.frame(scores(EnvFit_LowerMontane, display = "vectors"))
 LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
 
+LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>% 
+  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
+                                EnvPred == "heat_load" ~ "Heat Load", 
+                                EnvPred == "canopy_cover" ~ "Canopy Cover", 
+                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+                                EnvPred == "total_ba" ~ "Total Basal Area", 
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+         
 #Upper Montane EnvFit df for plotting
 UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
 
 UpperMontane.env.scoresdf <- as.data.frame(scores(EnvFit_UpperMontane, display = "vectors"))
 UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
+
+UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>% 
+  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
+                                EnvPred == "heat_load" ~ "Heat Load", 
+                                EnvPred == "canopy_cover" ~ "Canopy Cover", 
+                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+                                EnvPred == "total_ba" ~ "Total Basal Area", 
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+         
 
 
 #Subalpine EnvFit df for plotting
@@ -454,6 +471,15 @@ Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites")
 
 Subalpine.env.scoresdf <- as.data.frame(scores(EnvFit_Subalpine, display = "vectors"))
 Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
+
+Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>% 
+  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
+                                EnvPred == "heat_load" ~ "Heat Load", 
+                                EnvPred == "canopy_cover" ~ "Canopy Cover", 
+                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+                                EnvPred == "total_ba" ~ "Total Basal Area", 
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+         
 ```
 
 
@@ -467,31 +493,18 @@ library(ggrepel)
 
 #Lower Montane plot
 ggplot() +
-  geom_point(
-    data = subset(fort_LowerMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2),
-    colour = "black",
-    alpha = 0.5
+  geom_segment(
+    data = LowerMontane.env.scoresdf,
+    aes(
+      x = 0,
+      xend = NMDS1,
+      y = 0,
+      yend = NMDS2,
+      colour = EnvPred2
+    ),
+    arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75
   ) +
-  # geom_text(
-  #   data = subset(fort_LowerMontane, Score == "sites"),size = 3,
-  #   mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1)
-  # ) +
-  # ^Adds labels for sites 
-  labs(title = "Lower Montane") +
-  geom_text(
-    data = subset(fort_LowerMontane, Score == 'species', check_overlap = T),
-    size = 3.25,
-    #Pushes label away from the arrow
-    mapping = aes(
-      label = Label,
-      x = NMDS1 * 1.1,
-      y = NMDS2 * 1.1
-    )
-  ) +
-  geom_segment(data = LowerMontane.env.scoresdf, aes(x = 0, xend = NMDS1, y=0, yend = NMDS2, colour = EnvPred),
-               arrow = arrow(length = unit(0.025, "npc")),
-    size = 0.75)+ 
   # geom_text(data = LowerMontane.env.scoresdf, aes(x=0,y=0, label = str_wrap(EnvPred)))+
   geom_abline(
     #Horizontal line through origin
@@ -507,6 +520,28 @@ ggplot() +
     linetype = "dashed",
     size = 0.5,
     colour = "gray"
+  ) +
+  geom_point(
+    data = subset(fort_LowerMontane, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2),
+    colour = "black",
+    alpha = 0.5
+  ) +
+  # geom_text(
+  #   data = subset(fort_LowerMontane, Score == "sites"),size = 3,
+  #   mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1)
+  # ) +
+  # ^Adds labels for sites
+  labs(title = "Lower Montane") +
+  geom_text(
+    data = subset(fort_LowerMontane, Score == 'species', check_overlap = T),
+    size = 3.25,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
   ) +
   theme_few() +
   theme(
@@ -529,20 +564,18 @@ fort_UpperMontane <- fortify(NMDS_UpperMontane)
 
 #Upper Montane plot
 ggplot() +
-  geom_point(
-    data = subset(fort_UpperMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2),
-    colour = "black",
-    alpha = 0.5
+  geom_segment(
+    data = UpperMontane.env.scoresdf,
+    aes(
+      x = 0,
+      xend = NMDS1,
+      y = 0,
+      yend = NMDS2,
+      colour = EnvPred2
+    ),
+    arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75
   ) +
-  labs(title = "Upper Montane")+
-  geom_text( 
-    data = subset(fort_UpperMontane, Score == 'species', check_overlap = T), size = 3.25,
-    #Pushes label away from the arrow
-    mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
-  geom_segment(data = UpperMontane.env.scoresdf, aes(x = 0, xend = NMDS1, y=0, yend = NMDS2, colour = EnvPred),
-               arrow = arrow(length = unit(0.025, "npc")),
-    size = 0.75)+ 
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -558,6 +591,23 @@ ggplot() +
     linetype = "dashed",
     size = 0.5,
     colour = "gray"
+  ) +
+  geom_point(
+    data = subset(fort_UpperMontane, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2),
+    colour = "black",
+    alpha = 0.5
+  ) +
+  labs(title = "Upper Montane") +
+  geom_text(
+    data = subset(fort_UpperMontane, Score == 'species', check_overlap = T),
+    size = 3.25,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
   ) +
   theme_few() +
   theme(
@@ -578,17 +628,18 @@ fort_Subalpine <- fortify(NMDS_Subalpine)
 
 #Subalpine plot
 ggplot() +
-  geom_point(
-    data = subset(fort_Subalpine, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2),
-    colour = "black",
-    alpha = 0.5
+  geom_segment(
+    data = Subalpine.env.scoresdf,
+    aes(
+      x = 0,
+      xend = NMDS1,
+      y = 0,
+      yend = NMDS2,
+      colour = EnvPred2
+    ),
+    arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75
   ) +
-  labs(title = "Subalpine")+
-  geom_text( 
-    data = subset(fort_Subalpine, Score == 'species', check_overlap = T), size = 3.25,
-    #Pushes label away from the arrow
-    mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1))+
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -598,15 +649,30 @@ ggplot() +
     colour = "gray"
     
   ) +
-  geom_segment(data = Subalpine.env.scoresdf, aes(x = 0, xend = NMDS1, y=0, yend = NMDS2, colour = EnvPred),
-               arrow = arrow(length = unit(0.025, "npc")), 
-    size = 0.75)+ 
+  
   geom_vline(
     #Vertical line through origin
     aes(xintercept = 0),
     linetype = "dashed",
     size = 0.5,
     colour = "gray"
+  ) +
+  geom_point(
+    data = subset(fort_Subalpine, Score == "sites"),
+    mapping = aes(x = NMDS1, y = NMDS2),
+    colour = "black",
+    alpha = 0.5
+  ) +
+  labs(title = "Subalpine") +
+  geom_text(
+    data = subset(fort_Subalpine, Score == 'species', check_overlap = T),
+    size = 3.25,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
   ) +
   theme_few() +
   theme(
