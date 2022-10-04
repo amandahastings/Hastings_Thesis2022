@@ -404,11 +404,11 @@ vegan:: stressplot(NMDS_Subalpine)
 
 ```{r}
 #Attempts to plot with ggvegan
-autoplot(NMDS_LowerMontane)
-
-autoplot(NMDS_UpperMontane)
-
-autoplot(NMDS_Subalpine)
+# autoplot(NMDS_LowerMontane)
+# 
+# autoplot(NMDS_UpperMontane)
+# 
+# autoplot(NMDS_Subalpine)
 
 ```
 
@@ -534,7 +534,8 @@ ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
-  scale_color_viridis(discrete = TRUE, option="plasma")+
+  labs(color = "") +
+  scale_color_viridis(discrete = TRUE, option = "plasma") +
   # geom_text(data = LowerMontane.env.scoresdf, aes(x=0,y=0, label = str_wrap(EnvPred)))+
   geom_abline(
     #Horizontal line through origin
@@ -553,7 +554,8 @@ ggplot() +
   ) +
   geom_point(
     data = subset(fort.plot_LowerMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category), size=2,
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
+    size = 2,
     colour = "black",
     alpha = 0.5
   ) +
@@ -562,9 +564,12 @@ ggplot() +
   #   mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1)
   # ) +
   # ^Adds labels for sites
-  labs(title = "Lower Montane") +
+  labs(title = "Lower Montane", shape = "Burn Severity") +
+  theme(legend.title = element_text(size = 10)) +
   geom_text(
-    data = subset(fort_LowerMontane, Score == 'species'), check_overlap = F, fontface = "bold",
+    data = subset(fort_LowerMontane, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
     size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(
@@ -579,10 +584,10 @@ ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_blank(), 
-    legend.text = element_text(size=8)
-  ) + 
-  labs(x="NMDS1", y= "NMDS2")
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
     
 ```
 
@@ -621,7 +626,8 @@ ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
-  scale_color_viridis(discrete = TRUE, option="plasma")+
+  labs(color = "") +
+  scale_color_viridis(discrete = TRUE, option = "plasma") +
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -629,7 +635,6 @@ ggplot() +
     linetype = "dashed",
     size = 0.5,
     colour = "gray"
-    
   ) +
   geom_vline(
     #Vertical line through origin
@@ -640,13 +645,16 @@ ggplot() +
   ) +
   geom_point(
     data = subset(fort.plot_UpperMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category), size=2,
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
+    size = 2,
     colour = "black",
     alpha = 0.5
   ) +
-  labs(title = "Upper Montane") +
+  labs(title = "Upper Montane", shape = "Burn Severity") +
   geom_text(
-    data = subset(fort_UpperMontane, Score == 'species'), check_overlap = F, fontface = "bold",
+    data = subset(fort_UpperMontane, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
     size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(
@@ -661,10 +669,10 @@ ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_blank(), 
-    legend.text = element_text(size=8)
-  ) + 
-  labs(x="NMDS1", y= "NMDS2")
+    legend.title = element_text(size=10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
 ```
 
 ## Subalpine plot 
@@ -698,7 +706,8 @@ ggplot() +
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
-  scale_color_viridis(discrete = TRUE, option="plasma")+
+  labs(color = "") +
+  scale_color_viridis(discrete = TRUE, option = "plasma") +
   geom_abline(
     #Horizontal line through origin
     intercept = 0,
@@ -708,7 +717,6 @@ ggplot() +
     colour = "gray"
     
   ) +
-  
   geom_vline(
     #Vertical line through origin
     aes(xintercept = 0),
@@ -718,13 +726,16 @@ ggplot() +
   ) +
   geom_point(
     data = subset(fort.plot_Subalpine, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category), size=2,
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
+    size = 2,
     colour = "black",
     alpha = 0.5
   ) +
-  labs(title = "Subalpine") +
+  labs(title = "Subalpine", shape = "Burn Severity") +
   geom_text(
-    data = subset(fort_Subalpine, Score == 'species'), check_overlap = F, fontface = "bold",
+    data = subset(fort_Subalpine, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
     size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(
@@ -739,10 +750,10 @@ ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_blank(),
-    legend.text = element_text(size=8)
-  ) + 
-  labs(x="NMDS1", y= "NMDS2")
+    legend.title = element_text(size=10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
 ```
 
 
