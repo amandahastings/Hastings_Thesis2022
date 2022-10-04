@@ -95,10 +95,10 @@ PlantCoverPlot <- ggplot(
     vjust = .8,
     hjust = .8
   ),
-  axis.title.x=element_text(size=11), 
-    axis.title.y=element_text(size=11), 
-    axis.text.y = element_text(size=8), 
-    legend.title=element_text(size=11)) + 
+  axis.title.x = element_text(size = 11),
+  axis.title.y = element_text(size = 11),
+  axis.text.y = element_text(size = 8),
+  legend.title = element_text(size = 11)) + 
   scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))
 PlantCoverPlot 
 

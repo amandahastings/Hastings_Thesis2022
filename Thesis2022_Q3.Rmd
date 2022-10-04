@@ -564,7 +564,7 @@ ggplot() +
   # ^Adds labels for sites
   labs(title = "Lower Montane") +
   geom_text(
-    data = subset(fort_LowerMontane, Score == 'species'), check_overlap = T, fontface = "bold",
+    data = subset(fort_LowerMontane, Score == 'species'), check_overlap = F, fontface = "bold",
     size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(
@@ -646,7 +646,7 @@ ggplot() +
   ) +
   labs(title = "Upper Montane") +
   geom_text(
-    data = subset(fort_UpperMontane, Score == 'species'), check_overlap = T, fontface = "bold",
+    data = subset(fort_UpperMontane, Score == 'species'), check_overlap = F, fontface = "bold",
     size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(
@@ -724,7 +724,7 @@ ggplot() +
   ) +
   labs(title = "Subalpine") +
   geom_text(
-    data = subset(fort_Subalpine, Score == 'species'), check_overlap = T, fontface = "bold",
+    data = subset(fort_Subalpine, Score == 'species'), check_overlap = F, fontface = "bold",
     size = 3.25,
     #Pushes label away from the arrow
     mapping = aes(
