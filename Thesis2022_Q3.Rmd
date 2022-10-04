@@ -552,13 +552,13 @@ ggplot() +
     size = 0.5,
     colour = "gray"
   ) +
-  geom_point(
-    data = subset(fort.plot_LowerMontane, Score == "sites"),
+  geom_point(data = subset(fort.plot_LowerMontane, Score == "sites"), size = 2,
+    color="black",
+    alpha = 0.75,
     mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
-    size = 2,
-    colour = "black",
-    alpha = 0.5
   ) +
+  # scale_shape_manual(values=c(17, 18))+
+  
   # geom_text(
   #   data = subset(fort_LowerMontane, Score == "sites"),size = 3,
   #   mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1)
@@ -644,12 +644,10 @@ ggplot() +
     colour = "gray"
   ) +
   geom_point(
-    data = subset(fort.plot_UpperMontane, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
-    size = 2,
-    colour = "black",
-    alpha = 0.5
-  ) +
+    data = subset(fort.plot_UpperMontane, Score == "sites"),size = 2,
+    color="black",
+    alpha = 0.75,
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category)) +
   labs(title = "Upper Montane", shape = "Burn Severity") +
   geom_text(
     data = subset(fort_UpperMontane, Score == 'species'),
@@ -725,12 +723,10 @@ ggplot() +
     colour = "gray"
   ) +
   geom_point(
-    data = subset(fort.plot_Subalpine, Score == "sites"),
-    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
-    size = 2,
-    colour = "black",
-    alpha = 0.5
-  ) +
+    data = subset(fort.plot_Subalpine, Score == "sites"),size = 2,
+    color="black",
+    alpha = 0.75,
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category) ) +
   labs(title = "Subalpine", shape = "Burn Severity") +
   geom_text(
     data = subset(fort_Subalpine, Score == 'species'),
