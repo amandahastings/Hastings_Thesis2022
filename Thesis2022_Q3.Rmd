@@ -47,10 +47,21 @@ ThesisSeedlings <- ThesisSeedlingsData %>%
   dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
   select_if(~!any(is.na(.)))
 
+## Add coarse woody debris calculations 
+CWD_Data <- read.csv("CWDCalculations10.4.22.csv") %>%
+  group_by(PlotID) %>%
+  mutate("PlotSum_CWD" = sum(Mg.plot..ha.)) %>%
+  ungroup() %>%
+  dplyr::select(PlotID, PlotSum_CWD) %>%
+  filter(!duplicated(PlotID)) %>%
+  filter(!PlotID %in% c('LS11','HS02','HS13'))%>% 
+  rename("1000hr" = PlotSum_CWD)
+
 ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
   arrange(PlotID)%>% 
   mutate(forest_type = factor(forest_type))%>% 
-  mutate(burn_sev_category = factor(burn_sev_category))
+  mutate(burn_sev_category = factor(burn_sev_category))%>% 
+  full_join(., CWD_Data, by= "PlotID" )
 ```
 
 ## Terraclimate calculations 
@@ -130,18 +141,6 @@ ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", al
   
 ```
 
-## Add coarse woody debris calculations 
-
-```{r}
-CWD_Data <- read.csv("CWDCalculations10.4.22.csv") %>%
-  group_by(PlotID) %>%
-  mutate("PlotSum_CWD" = sum(Mg.plot..ha.)) %>%
-  ungroup() %>%
-  dplyr::select(PlotID, PlotSum_CWD) %>%
-  filter(!duplicated(PlotID)) %>%
-  filter(!PlotID %in% 'HS13')
-```
-
 
 ## NMDS response data frames relativized by maximum value
 
@@ -213,7 +212,7 @@ max_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 ```
 
 
-## NMDS response data frames by z scores
+## NMDS response data frames by z scores - NOT USING
 
 ```{r}
 #Lower Montane zscore data frame
