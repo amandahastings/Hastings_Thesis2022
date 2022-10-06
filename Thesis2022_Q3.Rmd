@@ -130,6 +130,18 @@ ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", al
   
 ```
 
+## Add coarse woody debris calculations 
+
+```{r}
+CWD_Data <- read.csv("CWDCalculations10.4.22.csv") %>%
+  group_by(PlotID) %>%
+  mutate("PlotSum_CWD" = sum(Mg.plot..ha.)) %>%
+  ungroup() %>%
+  dplyr::select(PlotID, PlotSum_CWD) %>%
+  filter(!duplicated(PlotID)) %>%
+  filter(!PlotID %in% 'HS13')
+```
+
 
 ## NMDS response data frames relativized by maximum value
 
