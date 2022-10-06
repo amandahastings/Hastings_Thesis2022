@@ -55,7 +55,7 @@ CWD_Data <- read.csv("CWDCalculations10.4.22.csv") %>%
   dplyr::select(PlotID, PlotSum_CWD) %>%
   filter(!duplicated(PlotID)) %>%
   filter(!PlotID %in% c('LS11','HS02','HS13'))%>% 
-  rename("1000hr" = PlotSum_CWD)
+  rename("CWD" = PlotSum_CWD)
 
 ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
   arrange(PlotID)%>% 
@@ -316,7 +316,7 @@ z_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 #OVerlay predictors data frame 
 OverlayPredictors1 <- ThesisAll1 %>% 
   # dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
-  dplyr::select(PlotID, burn_sev_category, forest_type, aspect_rescaled, heat_load, canopy_cover, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba)%>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type, aspect_rescaled, heat_load, canopy_cover, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, CWD)%>% 
   rowwise()%>%
   mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
   mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
@@ -365,7 +365,7 @@ OverlayPred_UpperMontane <- OverlayPredictors1 %>%
 #Overlay Predictors Lower Montane 
 OverlayPred_Subalpine <- OverlayPredictors1 %>% 
   filter(forest_type == "Subalpine")%>% 
-  dplyr::select(!c(forest_type, canopy_cover, barren_cover)) %>% 
+  dplyr::select(!c(forest_type, canopy_cover, barren_cover, CWD)) %>% 
   # mutate(across(avg_seed_source:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   # replace(is.na(.),0)%>%
   remove_rownames %>%
@@ -468,7 +468,8 @@ LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>%
                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
                                 EnvPred == "total_ba" ~ "Total Basal Area", 
                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>%
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+                                EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
   filter(!is.na(EnvPred2))
          
 #Upper Montane EnvFit df for plotting
@@ -484,7 +485,8 @@ UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>%
                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
                                 EnvPred == "total_ba" ~ "Total Basal Area", 
                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>% 
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+                                EnvPred == "CWD" ~ "Coarse Woody Debris"))%>% 
   filter(!is.na(EnvPred2))
   
          
