@@ -456,7 +456,9 @@ LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "s
 LowerMontane.env.scores1 <- as.data.frame(scores(EnvFit_LowerMontane, display = "factors"))
 LowerMontane.env.scores1 <- cbind(LowerMontane.env.scores1, EnvPred = rownames(LowerMontane.env.scores1))
 
-LowerMontane.env.scoresdf <- as.data.frame(scores(EnvFit_LowerMontane, display = "vectors"))
+LowerMontane.env.scoresdf <-
+  as.data.frame(scores(EnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(EnvFit_LowerMontane)
+
 LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
 
 LowerMontane.env.scoresdf <- rbind(LowerMontane.env.scoresdf, LowerMontane.env.scores1)
@@ -475,7 +477,9 @@ LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>%
 #Upper Montane EnvFit df for plotting
 UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
 
-UpperMontane.env.scoresdf <- as.data.frame(scores(EnvFit_UpperMontane, display = "vectors"))
+UpperMontane.env.scoresdf <-
+  as.data.frame(scores(EnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(EnvFit_UpperMontane)
+
 UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
 
 UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>% 
@@ -495,7 +499,9 @@ UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>%
 #Subalpine EnvFit df for plotting
 Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
 
-Subalpine.env.scoresdf <- as.data.frame(scores(EnvFit_Subalpine, display = "vectors"))
+Subalpine.env.scoresdf <-
+  as.data.frame(scores(EnvFit_Subalpine, display = "vectors")) * ordiArrowMul(EnvFit_Subalpine)
+
 Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
 
 Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>% 
@@ -627,6 +633,11 @@ fort.plot_UpperMontane <- merge(fort_UpperMontane, UpperMontaneSeverity, by.x = 
 
 #Upper Montane plot
 ggplot() +
+    geom_point(
+    data = subset(fort.plot_UpperMontane, Score == "sites"),size = 2,
+    color="black",
+    alpha = 0.65,
+    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category)) +
   geom_segment(
     data = UpperMontane.env.scoresdf,
     aes(
@@ -656,11 +667,7 @@ ggplot() +
     size = 0.5,
     colour = "gray"
   ) +
-  geom_point(
-    data = subset(fort.plot_UpperMontane, Score == "sites"),size = 2,
-    color="black",
-    alpha = 0.75,
-    mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category)) +
+
   labs(title = "Upper Montane", shape = "Burn Severity") +
   geom_text(
     data = subset(fort_UpperMontane, Score == 'species'),
