@@ -25,6 +25,8 @@ library(RColorBrewer)
 library(emmeans)
 library(multcomp)
 library(multcompView)
+library(ggthemes)
+library(scales)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -76,7 +78,8 @@ PlantCoverPlot <- ggplot(
       y = PercentPlantCover,
       fill = burn_sev_category)
 ) +
-  geom_boxplot() + ylim(0, 0.6) +
+  geom_boxplot() + 
+  # ylim(0, 0.6) +
   facet_wrap(~ forest_type) +
   theme_classic() +
   labs(x = "Functional Group",
@@ -99,7 +102,8 @@ PlantCoverPlot <- ggplot(
   axis.title.y = element_text(size = 11),
   axis.text.y = element_text(size = 8),
   legend.title = element_text(size = 11)) + 
-  scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))
+  scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
+  scale_y_continuous(labels = percent)
 PlantCoverPlot 
 
 ```
