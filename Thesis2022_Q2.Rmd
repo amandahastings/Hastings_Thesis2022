@@ -200,6 +200,36 @@ backFB
 ```
 
 
+# Shrub Cover Logistic Regression 
+```{r}
+PlantCoverBinary$BinaryCover <- as.factor(PlantCoverBinary$BinaryCover)
+
+ShrubCoverBinary <- PlantCoverBinary %>% 
+  filter(FunctionalGroup == 'sh_cover')
+
+LogisFitSH <- glm(BinaryCover ~ burn_sev_category, data=ShrubCoverBinary, family= "binomial" )
+
+library(car)
+library(emmeans)
+summary(LogisFitSH)
+Anova(LogisFitSH,type=3)
+emmeans(LogisFitSH,pairwise~burn_sev_category,type="response")
+```
+
+
+# Tree Cover Logistic Regression 
+```{r}
+TreeCoverBinary <- PlantCoverBinary %>% 
+  filter(FunctionalGroup == 'tr_cover')
+
+LogisFitTR <- glm(BinaryCover ~ burn_sev_category, data=TreeCoverBinary, family= "binomial" )
+
+summary(LogisFitTR)
+Anova(LogisFitTR, type=3)
+emmeans(LogisFitTR,pairwise~burn_sev_category, type="response")
+```
+
+
 
 
 
