@@ -3,6 +3,8 @@ title: "Thesis2022_Q2"
 author: "Amanda Hastings"
 date: "2022-09-19"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -101,7 +103,8 @@ PlantCoverPlot <- ggplot(
   axis.title.x = element_text(size = 11),
   axis.title.y = element_text(size = 11),
   axis.text.y = element_text(size = 8),
-  legend.title = element_text(size = 11)) + 
+  legend.title = element_text(size = 9), 
+  legend.text = element_text(size =9)) + 
   scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
   scale_y_continuous(labels = percent)
 PlantCoverPlot 
@@ -112,12 +115,12 @@ PlantCoverPlot
 
 ```{r,echo=FALSE}
 # # Graminoid ANOVA
-hist(ThesisAll1$gm_cover)
-LMFitGM <-
-  lm(gm_cover ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
-anova(LMFitGM)
-par(mfrow = c(1, 2))
-plot(LMFitGM, which = 1:2)
+# hist(ThesisAll1$gm_cover)
+# LMFitGM <-
+#   lm(gm_cover ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+# anova(LMFitGM)
+# par(mfrow = c(1, 2))
+# plot(LMFitGM, which = 1:2)
 
 # Sqrt Graminoid ANOVA - Analysis used for presentation(s) 
 ThesisAll1$sqrtGM <- sqrt(ThesisAll1$gm_cover)
@@ -142,7 +145,7 @@ plot(LMFitsqrtGM, which = 1:2)
 ```{r}
 #Tukey pairs Sqrt Graminoids
 #Differences by burn severity, but not forest type 
-emoutGM <- emmeans(LMFitsqrtGM, ~ burn_sev_category, transform="response")
+emoutGM <- emmeans(LMFitsqrtGM, ~ burn_sev_category)
 emoutGM
 pairs(emoutGM)
 cld(emoutGM)
@@ -151,7 +154,7 @@ cld(emoutGM)
 # Back transform graminoids 
 
 ```{r}
-backGM <- emmeans(LMFitsqrtGM, pairwise ~ burn_sev_category, transform = "response")
+backGM <- emmeans(LMFitsqrtGM, pairwise ~ burn_sev_category, regrid = "response")
 backGM
 
 ```
@@ -159,7 +162,7 @@ backGM
 # Forb ANOVA 
 
 ```{r, echo=FALSE}
-# Forb ANOVA
+# Forb ANOVA - Analysis used for presentation(s)
 hist(ThesisAll1$fb_cover)
 LMFitFB <-
   lm(fb_cover ~ burn_sev_category * forest_type, data = ThesisAll1)
@@ -167,13 +170,13 @@ anova(LMFitFB)
 par(mfrow = c(1, 2))
 plot(LMFitFB, which = 1:2)
 
-# Sqrt Forb ANOVA - Analysis used for presentation(s)
-ThesisAll1$sqrtFB <- sqrt(ThesisData$fb_cover)
-hist(ThesisAll1$sqrtFB)
-LMFitsqrtFB <- lm(sqrtFB ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
-anova(LMFitsqrtFB)
-par(mfrow = c(1, 2))
-plot(LMFitsqrtFB, which = 1:2)
+# Sqrt Forb ANOVA 
+# ThesisAll1$sqrtFB <- sqrt(ThesisData$fb_cover)
+# hist(ThesisAll1$sqrtFB)
+# LMFitsqrtFB <- lm(sqrtFB ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+# anova(LMFitsqrtFB)
+# par(mfrow = c(1, 2))
+# plot(LMFitsqrtFB, which = 1:2)
 
 # # log Forb ANOVA - not used
 # ThesisData$logFB <- log(ThesisData$fb_cover + 1)
@@ -183,20 +186,12 @@ plot(LMFitsqrtFB, which = 1:2)
 # Pairwise comparison forb ANOVA
 
 ```{r}
-#Tukey pairs Sqrt Forbs 
+#Tukey pairs Forbs 
 #Differences by forest type, but not burn severity 
 emoutFB <- emmeans(LMFitFB, ~ factor(forest_type))
 emoutFB
 pairs(emoutFB)
 cld(emoutFB)
-```
-
-# Back transform forbs (Assessing 9/22/22)
-
-```{r}
-backFB <- emmeans(LMFitsqrtFB, pairwise ~ factor(forest_type), transform = "response")
-backFB
-
 ```
 
 
