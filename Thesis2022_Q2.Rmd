@@ -29,6 +29,7 @@ library(multcomp)
 library(multcompView)
 library(ggthemes)
 library(scales)
+library(car)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -111,6 +112,8 @@ PlantCoverPlot
 
 ```
 
+#-----------------------Two-way ANOVA cover analyses----------------------------
+
 # Graminoid ANOVA
 
 ```{r,echo=FALSE}
@@ -159,6 +162,17 @@ backGM
 
 ```
 
+# Confirmatory plots - graminoid cover by burn severity only
+
+```{r}
+GramOnly <- ThesisAll1 %>% 
+  dplyr::select(burn_sev_category, gm_cover)
+
+GramBurnSevPlot <- ggplot(data=GramOnly, mapping = aes(x=burn_sev_category, y=gm_cover))+ 
+  geom_boxplot()
+GramBurnSevPlot
+```
+
 # Forb ANOVA 
 
 ```{r, echo=FALSE}
@@ -194,6 +208,32 @@ pairs(emoutFB)
 cld(emoutFB)
 ```
 
+# Confirmatory plots - forb cover by forest type only 
+
+```{r}
+ForbOnly <- ThesisAll1 %>% 
+  dplyr::select(forest_type, fb_cover)
+
+ForbForestTypePlot <- ggplot(data=ForbOnly, mapping = aes(x=forest_type, y=fb_cover))+ 
+  geom_boxplot()
+ForbForestTypePlot 
+```
+
+
+#-----------------------Logistic regression cover analyses----------------------
+
+
+# Plant Cover Long Data plus Binary Column
+```{r}
+# Round percent cover to four decimal places 
+PlantCoverLong$PercentPlantCover <- round(PlantCoverLong$PercentPlantCover,4)
+
+
+PlantCoverBinary <- PlantCoverLong %>% 
+  mutate("BinaryCover" = case_when(PercentPlantCover == 0.0000 ~ 0,
+         PercentPlantCover != 0.0000 ~ 1))
+```
+
 
 # Shrub Cover Logistic Regression 
 ```{r}
@@ -202,13 +242,15 @@ PlantCoverBinary$BinaryCover <- as.factor(PlantCoverBinary$BinaryCover)
 ShrubCoverBinary <- PlantCoverBinary %>% 
   filter(FunctionalGroup == 'sh_cover')
 
-LogisFitSH <- glm(BinaryCover ~ burn_sev_category, data=ShrubCoverBinary, family= "binomial" )
+LogisFitSH <- glm(BinaryCover ~ burn_sev_category* forest_type, data=ShrubCoverBinary, family= "binomial" )
 
-library(car)
-library(emmeans)
 summary(LogisFitSH)
 Anova(LogisFitSH,type=3)
-emmeans(LogisFitSH,pairwise~burn_sev_category,type="response")
+```
+#########Need to look at this 
+
+```{r}
+emmeans(LogisFitSH,pairwise~burn_sev_category*forest_type,type="response")
 ```
 
 
@@ -217,11 +259,20 @@ emmeans(LogisFitSH,pairwise~burn_sev_category,type="response")
 TreeCoverBinary <- PlantCoverBinary %>% 
   filter(FunctionalGroup == 'tr_cover')
 
-LogisFitTR <- glm(BinaryCover ~ burn_sev_category, data=TreeCoverBinary, family= "binomial" )
+LogisFitTR <- glm(BinaryCover ~ burn_sev_category * forest_type, data=TreeCoverBinary, family= "binomial" )
 
 summary(LogisFitTR)
 Anova(LogisFitTR, type=3)
-emmeans(LogisFitTR,pairwise~burn_sev_category, type="response")
+```
+
+
+#########Need to look at this 
+
+```{r}
+emoutTR <- emmeans(LogisFitTR, ~ factor(forest_type))
+emoutTR
+pairs(emoutTR)
+cld(emoutTR)
 ```
 
 
