@@ -47,9 +47,92 @@ ThesisSeedlings <- ThesisSeedlingsData %>%
 ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
   arrange(PlotID)%>% 
   mutate(forest_type = factor(forest_type))
+
+```
+
+## Create data frame with na values for tree species not expected in forest types 
+
+```{r}
+ThesisSeedRename <- ThesisAll1 %>% 
+  dplyr::select(forest_type, burn_sev_category, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>%
+  rename("POTR"= 3, "QUGA"= 4, "RONE"= 5, "PIPO"= 6, "PSME"= 7, "ABCO"= 8,  "PICO" = 9, "PIFL" = 10, "PIAR"=11, "ABLA"=12, "PIEN"=13)
+
+
+ThesisNAs <- ThesisSeedRename %>%
+  mutate(PIEN = replace(PIEN, forest_type == "Lower Montane" | forest_type == "Upper Montane", NA)) 
+           
+# na_if(forest_type, "Lower Montane"))
+         
 ```
 
 
+# Seedlings long data
+```{r}
+# Covert seedlings data to long format
+SeedlingsLong <- ThesisAll1 %>%
+  tidyr::pivot_longer(cols = c(POTR:PIEN),
+                      names_to = "Species",
+                      values_to = "Density") %>% 
+  mutate(forest_type = factor(
+    forest_type,
+    levels = c("Lower Montane", "Upper Montane", "Subalpine")
+  )) %>% 
+  mutate(Species = factor(Species,
+                          levels = c("PIPO","PSME","ABCO","PICO","PIFL", "PIAR","ABLA","PIEN", "QUGA", "RONE","POTR")))
+```
+
+
+# Facet axis removing labels for species not present in forest types 
+```{r}
+#Omit na values
+SeedlingsLong2 <- SeedlingsLong %>% 
+  na.omit
+```
+
+
+# Seedlings plot 
+```{r}
+# Facet wrap by forest type - seedlings plot
+
+ggplot(SeedlingsLong,
+       aes(x = Species, y = Density, fill = burn_sev_category)) +
+  geom_boxplot() + 
+  # ylim(0, 25000) +
+  facet_wrap(~ forest_type, scales="free_x") +
+  labs(x = "Species",
+       y = "Seedlings per hectare",
+       fill = "Burn Severity") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(1, "cm")) +
+  theme_few() +
+  scale_fill_manual(
+    name = "Burn Severity",
+    labels = c("Low", "High"), values=c("#fd8d3c","#bd0026")) +
+  theme(
+    axis.text.x = element_text(
+      color = "black",
+      size = 6,
+      angle = 45,
+      vjust = .8,
+      hjust = .8
+    ), 
+    axis.title.x=element_text(size=11), 
+    axis.title.y=element_text(size=11), 
+    axis.text.y = element_text(size=8), 
+    legend.title=element_text(size=11))
+```
+
+#------------Conifer/decid analyses---------------------------------------------
+
+
+# Two way ANOVA deciduous density only, sqrt transform
+```{r}
+# Two way ANOVA deciduous, sqrt transform
+LMFitDecidsqrt <- lm(sqrt(deciduous_total) ~ burn_sev_category * forest_type, data = ThesisData)
+anova(LMFitDecidsqrt)
+par(mfrow = c(1, 2))
+plot(LMFitDecidsqrt, which = 1:2)
+```
 
 
 
