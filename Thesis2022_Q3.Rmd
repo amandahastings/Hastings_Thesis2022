@@ -585,7 +585,8 @@ fort.plot_LowerMontane <- merge(fort_LowerMontane, LowerMontaneSeverity, by.x = 
 library(ggrepel)
 
 #Lower Montane plot
-ggplot() +
+#Only sites 
+sitesplot_LowerMontane <- ggplot() +
   geom_segment(
     data = LowerMontane.env.scoresdf,
     aes(
@@ -617,7 +618,6 @@ ggplot() +
     colour = "gray"
   ) +
   geom_point(data = subset(fort.plot_LowerMontane, Score == "sites"), size = 2,
-    color="black",
     alpha = 0.75,
     mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
   ) +
@@ -652,7 +652,100 @@ ggplot() +
     legend.text = element_text(size = 8)
   ) +
   labs(x = "NMDS1", y = "NMDS2")
+
+sitesplot_LowerMontane
     
+```
+
+
+```{r}
+#Lower Montane plot
+#Only arrows
+arrowsplot_LowerMontane <- ggplot() +
+  geom_segment(
+    data = LowerMontane.env.scoresdf,
+    aes(
+      x = 0,
+      xend = NMDS1,
+      y = 0,
+      yend = NMDS2),
+    arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75
+  ) +
+  # labs(color = "") +
+  # scale_color_viridis(discrete = TRUE, option = "plasma") +
+  geom_text(
+    data = LowerMontane.env.scoresdf ,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = EnvPred2,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
+  ) +
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  # geom_point(data = subset(fort.plot_LowerMontane, Score == "sites"), size = 2,
+  #   color="black",
+  #   alpha = 0.75,
+  #   mapping = aes(x = NMDS1, y = NMDS2, shape = burn_sev_category),
+  # ) +
+  # scale_shape_manual(values=c(17, 18))+
+  
+  # geom_text(
+  #   data = subset(fort_LowerMontane, Score == "sites"),size = 3,
+  #   mapping = aes(label = Label, x = NMDS1 * 1.1, y = NMDS2 * 1.1)
+  # ) +
+  # ^Adds labels for sites
+  labs(title = "Lower Montane", shape = "Burn Severity") +
+  theme(legend.title = element_text(size = 10)) +
+  geom_text(
+    data = subset(fort_LowerMontane, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
+    size = 3.25,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
+
+arrowsplot_LowerMontane
+    
+```
+
+
+## Using ggarange - Lower Montane 
+
+```{r}
+#Create a multi-panel plot with one column 
+library(ggpubr)
+ggarrange(sitesplot_LowerMontane,arrowsplot_LowerMontane, ncol=1)
 ```
 
 
@@ -690,13 +783,13 @@ ggplot() +
       xend = NMDS1,
       y = 0,
       yend = NMDS2,
-      colour = EnvPred2
+      color = EnvPred2
     ),
     arrow = arrow(length = unit(0.025, "npc")),
     size = 0.75
   ) +
-  labs(color = "") +
-  scale_color_viridis(discrete = TRUE, option = "plasma") +
+  # labs(color = "") +
+  # scale_color_viridis(discrete = TRUE, option = "plasma") +
   geom_abline(
     #Horizontal line through origin
     intercept = 0,

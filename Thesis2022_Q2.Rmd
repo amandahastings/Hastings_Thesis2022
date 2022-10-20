@@ -242,7 +242,7 @@ PlantCoverBinary$BinaryCover <- as.factor(PlantCoverBinary$BinaryCover)
 ShrubCoverBinary <- PlantCoverBinary %>% 
   filter(FunctionalGroup == 'sh_cover')
 
-LogisFitSH <- glm(BinaryCover ~ burn_sev_category* forest_type, data=ShrubCoverBinary, family= "binomial" )
+LogisFitSH <- glm(BinaryCover ~ burn_sev_category + forest_type, data=ShrubCoverBinary, family= "binomial" )
 
 summary(LogisFitSH)
 Anova(LogisFitSH,type=3)
@@ -250,7 +250,9 @@ Anova(LogisFitSH,type=3)
 #########Need to look at this 
 
 ```{r}
-emmeans(LogisFitSH,pairwise~burn_sev_category*forest_type,type="response")
+emmeans(LogisFitSH,pairwise~burn_sev_category,type="response")
+
+emmeans(LogisFitSH,pairwise~forest_type,type="response")
 ```
 
 
@@ -259,20 +261,25 @@ emmeans(LogisFitSH,pairwise~burn_sev_category*forest_type,type="response")
 TreeCoverBinary <- PlantCoverBinary %>% 
   filter(FunctionalGroup == 'tr_cover')
 
-LogisFitTR <- glm(BinaryCover ~ burn_sev_category * forest_type, data=TreeCoverBinary, family= "binomial" )
+LogisFitTR <- glm(BinaryCover ~ burn_sev_category + forest_type, data=TreeCoverBinary, family= "binomial" )
 
 summary(LogisFitTR)
-Anova(LogisFitTR, type=3)
+Anova(LogisFitTR, type=3)=
 ```
 
 
 #########Need to look at this 
 
 ```{r}
-emoutTR <- emmeans(LogisFitTR, ~ factor(forest_type))
-emoutTR
-pairs(emoutTR)
-cld(emoutTR)
+# emoutTR <- emmeans(LogisFitTR, ~ factor(forest_type))
+# emoutTR
+# pairs(emoutTR)
+# cld(emoutTR)
+
+
+emmeans(LogisFitTR,pairwise~burn_sev_category,type="response")
+
+emmeans(LogisFitTR,pairwise~forest_type,type="response")
 ```
 
 

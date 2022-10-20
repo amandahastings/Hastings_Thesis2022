@@ -25,6 +25,7 @@ library(RColorBrewer)
 library(emmeans)
 library(multcomp)
 library(multcompView)
+library(ggthemes)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -59,9 +60,14 @@ ThesisSeedRename <- ThesisAll1 %>%
 
 
 ThesisNAs <- ThesisSeedRename %>%
-  mutate(PIEN = replace(PIEN, forest_type == "Lower Montane" | forest_type == "Upper Montane", NA)) 
-           
-# na_if(forest_type, "Lower Montane"))
+  mutate(QUGA = replace(QUGA, forest_type == "Subalpine", NA))%>% 
+  mutate(RONE = replace(RONE, forest_type == "Subalpine" | forest_type == "Upper Montane", NA))%>% 
+  mutate(PIPO = replace(PIPO, forest_type == "Subalpine" | forest_type == "Upper Montane", NA))%>% 
+  mutate(PIFL = replace(PIFL, forest_type == "Lower Montane", NA))%>% 
+  mutate(PIAR = replace(PIAR, forest_type == "Lower Montane" | forest_type == "Upper Montane", NA))%>% 
+  mutate(ABLA = replace(ABLA, forest_type == "Lower Montane" | forest_type == "Upper Montane", NA))%>% 
+  mutate(PIEN = replace(PIEN, forest_type == "Lower Montane" | forest_type == "Upper Montane", NA))
+  
          
 ```
 
@@ -69,7 +75,7 @@ ThesisNAs <- ThesisSeedRename %>%
 # Seedlings long data
 ```{r}
 # Covert seedlings data to long format
-SeedlingsLong <- ThesisAll1 %>%
+SeedlingsLong <- ThesisNAs %>%
   tidyr::pivot_longer(cols = c(POTR:PIEN),
                       names_to = "Species",
                       values_to = "Density") %>% 
@@ -83,6 +89,7 @@ SeedlingsLong <- ThesisAll1 %>%
 
 
 # Facet axis removing labels for species not present in forest types 
+
 ```{r}
 #Omit na values
 SeedlingsLong2 <- SeedlingsLong %>% 
@@ -94,7 +101,7 @@ SeedlingsLong2 <- SeedlingsLong %>%
 ```{r}
 # Facet wrap by forest type - seedlings plot
 
-ggplot(SeedlingsLong,
+ggplot(SeedlingsLong2,
        aes(x = Species, y = Density, fill = burn_sev_category)) +
   geom_boxplot() + 
   # ylim(0, 25000) +
