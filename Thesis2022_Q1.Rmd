@@ -129,13 +129,29 @@ ggplot(SeedlingsLong2,
     legend.title=element_text(size=11))
 ```
 
+# Data frame analyses grouped by conifer/decid 
+
+```{r}
+#Add conifer and deciduous total columns 
+#POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total
+
+decid_list = c("POTR_total", "QUGA_total", "RONE_total")
+conifer_list = c("PIPO_total", "PSME_total", "ABCO_total", "PICO_total", "PIFL_total", "PIAR_total", "ABLA_total", "PIEN_total")
+
+
+ThesisAll1 <- ThesisAll1 %>% 
+  mutate("deciduous_total" = rowSums(ThesisAll1[,decid_list])) %>% 
+  mutate("conifer_total" = rowSums(ThesisAll1[,conifer_list]))
+```
+
+
 #------------Conifer/decid analyses---------------------------------------------
 
 
 # Two way ANOVA deciduous density only, sqrt transform
 ```{r}
 # Two way ANOVA deciduous, sqrt transform
-LMFitDecidsqrt <- lm(sqrt(deciduous_total) ~ burn_sev_category * forest_type, data = ThesisData)
+LMFitDecidsqrt <- lm(sqrt(deciduous_total) ~ burn_sev_category * forest_type, data = ThesisAll1)
 anova(LMFitDecidsqrt)
 par(mfrow = c(1, 2))
 plot(LMFitDecidsqrt, which = 1:2)
