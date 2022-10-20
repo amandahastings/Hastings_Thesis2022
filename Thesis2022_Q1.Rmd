@@ -26,6 +26,9 @@ library(emmeans)
 library(multcomp)
 library(multcompView)
 library(ggthemes)
+library(gh)
+library(pscl)
+library(car)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -151,11 +154,48 @@ ThesisAll1 <- ThesisAll1 %>%
 # Two way ANOVA deciduous density only, sqrt transform
 ```{r}
 # Two way ANOVA deciduous, sqrt transform
+ThesisAll1$deciduous_total<-as.integer(ThesisAll1$deciduous_total)
+
 LMFitDecidsqrt <- lm(sqrt(deciduous_total) ~ burn_sev_category * forest_type, data = ThesisAll1)
 anova(LMFitDecidsqrt)
 par(mfrow = c(1, 2))
 plot(LMFitDecidsqrt, which = 1:2)
 ```
 
+# Tukey pairs Deciduous Density - Forest Type
+```{r}
+#Tukey pairs Deciduous density 
+emoutDecid <- emmeans(LMFitDecidsqrt, ~forest_type)
+pairs(emoutDecid)
+cld(emoutDecid)
+```
+
+
+# Back transform deciduous seedlings
+
+```{r}
+backDecid <- emmeans(LMFitDecidsqrt, pairwise ~ forest_type, regrid = "response")
+backDecid
+
+```
+
+
+## Conifer density 
+
+# Conifer Poisson Regression
+```{r}
+ThesisAll1$conifer_total<-as.integer(ThesisAll1$conifer_total)
+
+ConiferPoisson <- glm(conifer_total~ burn_sev_category*forest_type, data=ThesisAll1, family=poisson) 
+summary(ConiferPoisson)
+Anova(ConiferPoisson)
+```
+
+
+```{r}
+emoutConifer <- emmeans(ConiferPoisson, ~burn_sev_category*forest_type)
+pairs(emoutConifer)
+cld(emoutConifer)
+```
 
 
