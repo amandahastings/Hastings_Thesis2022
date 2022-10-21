@@ -3,6 +3,8 @@ title: "Thesis2022_Q1"
 author: "Amanda Hastings"
 date: "2022-09-19"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -129,7 +131,7 @@ ggplot(SeedlingsLong2,
     axis.title.x=element_text(size=11), 
     axis.title.y=element_text(size=11), 
     axis.text.y = element_text(size=8), 
-    legend.title=element_text(size=11))
+    legend.title=element_text(size=9))
 ```
 
 # Data frame analyses grouped by conifer/decid 
@@ -193,7 +195,7 @@ Anova(ConiferPoisson)
 
 
 ```{r}
-emoutConifer <- emmeans(ConiferPoisson, ~burn_sev_category*forest_type)
+emoutConifer <- emmeans(ConiferPoisson, ~burn_sev_category*forest_type, type= "response")
 pairs(emoutConifer)
 cld(emoutConifer)
 ```

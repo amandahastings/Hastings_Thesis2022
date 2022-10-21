@@ -264,7 +264,7 @@ TreeCoverBinary <- PlantCoverBinary %>%
 LogisFitTR <- glm(BinaryCover ~ burn_sev_category + forest_type, data=TreeCoverBinary, family= "binomial" )
 
 summary(LogisFitTR)
-Anova(LogisFitTR, type=3)=
+Anova(LogisFitTR, type=3)
 ```
 
 
