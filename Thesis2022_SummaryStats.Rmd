@@ -1,0 +1,98 @@
+---
+title: "Thesis2022_SummaryStats"
+author: "Amanda Hastings"
+date: "2022-10-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
+
+#Load libraries
+library(tidyverse)
+library(dplyr)
+library(RColorBrewer)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+library(ggthemes)
+library(vegan)
+library(ggvegan)
+library(ggpubr)
+library(viridis)
+```
+
+## Formatting raw thesis site data and seedlings data 
+
+```{r}
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+ThesisSeedlings <- ThesisSeedlingsData %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
+  select_if(~!any(is.na(.)))
+
+## Add coarse woody debris calculations 
+CWD_Data <- read.csv("CWDCalculations10.4.22.csv") %>%
+  group_by(PlotID) %>%
+  mutate("PlotSum_CWD" = sum(Mg.plot..ha.)) %>%
+  ungroup() %>%
+  dplyr::select(PlotID, PlotSum_CWD) %>%
+  filter(!duplicated(PlotID)) %>%
+  filter(!PlotID %in% c('LS11','HS02','HS13'))%>% 
+  rename("CWD" = PlotSum_CWD)
+
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))%>% 
+  mutate(burn_sev_category = factor(burn_sev_category))%>% 
+  full_join(., CWD_Data, by= "PlotID" )
+```
+
+
+## Summary statistics environmental predictors 
+
+```{r}
+# Elevation: Mean/SD
+# Heat Load: Mean/SD
+# Distance to seed source: Mean/SD 
+# Live basal area: Mean/SD 
+# Canopy Cover: Mean/SD
+# Substrate cover (organic cover/barren): Mean/SD
+# CWD: Mean/SD 
+# Litter/woody debris: Mean/SD
+
+ThesisSumstats <- ThesisAll1 %>% 
+  dplyr::select(burn_sev_category, forest_type, field.elevation..m., heat_load, live_ba, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, CWD)%>%
+  rowwise()%>%
+  mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
+  mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
+  dplyr::select(!c(bg_cover:rk_cover))%>% 
+  dplyr::select(-barren_cover)
+
+  
+
+```
+
+
+## Summary statistics cover/densities 
+
+```{r}
+
+```
+
+## Summary stats seedlings 
+
+```{r}
+
+```
+
