@@ -126,8 +126,8 @@ PlantCoverPlot
 # plot(LMFitGM, which = 1:2)
 
 # Sqrt Graminoid ANOVA - Analysis used for presentation(s) 
-ThesisAll1$sqrtGM <- sqrt(ThesisAll1$gm_cover)
-hist(ThesisAll1$sqrtGM)
+# ThesisAll1$sqrtGM <- sqrt(ThesisAll1$gm_cover)
+# hist(ThesisAll1$sqrtGM)
 LMFitsqrtGM <- lm(sqrt(gm_cover) ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
 anova(LMFitsqrtGM)
 par(mfrow = c(1, 2))
@@ -220,70 +220,104 @@ ForbForestTypePlot
 ```
 
 
-#-----------------------Logistic regression cover analyses----------------------
+# Shrub ANOVA
 
-
-# Plant Cover Long Data plus Binary Column
 ```{r}
-# Round percent cover to four decimal places 
-PlantCoverLong$PercentPlantCover <- round(PlantCoverLong$PercentPlantCover,4)
+# Shrub ANOVA
+# hist(ThesisAll1$sh_cover)
+# LMFitSH <-
+#   lm(sh_cover ~ burn_sev_category * forest_type, data = ThesisAll1)
+# anova(LMFitSH)
+# par(mfrow = c(1, 2))
+# plot(LMFitSH, which = 1:2)
 
+# # Sqrt Shrub ANOVA - Analysis used for presentation(s)
+# ThesisAll1$sqrtSH <- sqrt(ThesisAll1$sh_cover)
+# hist(ThesisAll1$sqrtSH)
+LMFitsqrtSH <- lm(sqrt(sh_cover) ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+anova(LMFitsqrtSH)
+par(mfrow = c(1, 2))
+plot(LMFitsqrtSH, which = 1:2)
 
-PlantCoverBinary <- PlantCoverLong %>% 
-  mutate("BinaryCover" = case_when(PercentPlantCover == 0.0000 ~ 0,
-         PercentPlantCover != 0.0000 ~ 1))
+# LMFitsqrtSH_burn <- lm(sqrt(sh_cover) ~ burn_sev_category, data = ThesisAll1)
+# anova(LMFitsqrtSH_burn)
+# par(mfrow = c(1, 2))
+# plot(LMFitsqrtSH_burn, which = 1:2)
+# 
+# LMFitsqrtSH_forest <- lm(sqrt(sh_cover) ~ factor(forest_type), data= ThesisAll1)
+# anova(LMFitsqrtSH_forest)
+# par(mfrow = c(1, 2))
+# plot(LMFitsqrtSH_forest, which = 1:2)
+
+# # log Shrub ANOVA - not used
+# ThesisAll1$logSH <- log(ThesisAll1$sh_cover + 1)
+# hist(ThesisAll1$logSH)
+# LMFitLogSH <- lm(logSH ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+# anova(LMFitLogSH)
+# par(mfrow = c(1, 2))
+# plot(LMFitLogSH, which = 1:2)
 ```
 
 
-# Shrub Cover Logistic Regression 
-```{r}
-PlantCoverBinary$BinaryCover <- as.factor(PlantCoverBinary$BinaryCover)
-
-ShrubCoverBinary <- PlantCoverBinary %>% 
-  filter(FunctionalGroup == 'sh_cover')
-
-LogisFitSH <- glm(BinaryCover ~ burn_sev_category + forest_type, data=ShrubCoverBinary, family= "binomial" )
-
-summary(LogisFitSH)
-Anova(LogisFitSH,type=3)
-```
-#########Need to look at this 
+# Pairwise comparisons shrub ANOVA
 
 ```{r}
-emmeans(LogisFitSH,pairwise~burn_sev_category,type="response")
-
-emmeans(LogisFitSH,pairwise~forest_type,type="response")
+#Tukey pairs Sqrt Shrubs with interaction term 
+emoutSH <- emmeans(LMFitsqrtSH, ~ burn_sev_category*factor(forest_type))
+emoutSH
+pairs(emoutSH)
+cld(emoutSH)
 ```
 
 
-# Tree Cover Logistic Regression 
 ```{r}
-TreeCoverBinary <- PlantCoverBinary %>% 
-  filter(FunctionalGroup == 'tr_cover')
-
-LogisFitTR <- glm(BinaryCover ~ burn_sev_category + forest_type, data=TreeCoverBinary, family= "binomial" )
-
-summary(LogisFitTR)
-Anova(LogisFitTR, type=3)
+#Tukey pairs Sqrt Shrubs by forest type 
+emoutSH_forest <- emmeans(LMFitsqrtSH, ~factor(forest_type))
+emoutSH_forest
+pairs(emoutSH_forest)
+cld(emoutSH_forest)
 ```
 
-
-#########Need to look at this 
+# Back transform shrubs
 
 ```{r}
-# emoutTR <- emmeans(LogisFitTR, ~ factor(forest_type))
-# emoutTR
-# pairs(emoutTR)
-# cld(emoutTR)
-
-
-emmeans(LogisFitTR,pairwise~burn_sev_category,type="response")
-
-emmeans(LogisFitTR,pairwise~forest_type,type="response")
+backSH <- emmeans(LMFitsqrtSH, pairwise ~ burn_sev_category*factor(forest_type), regrid = "response")
+backSH
 ```
 
 
 
+
+# Confirmatory plots - shrub cover
+
+```{r}
+
+```
+
+# Tree ANOVA 
+
+```{r}
+
+```
+
+
+# Pairwise comparison tree ANOVA 
+
+```{r}
+
+```
+
+# Back transform trees 
+
+```{r}
+
+```
+
+# Confirmatory plots - tree cover
+
+```{r}
+
+```
 
 
 
