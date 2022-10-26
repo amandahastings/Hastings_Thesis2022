@@ -168,9 +168,9 @@ backGM
 GramOnly <- ThesisAll1 %>% 
   dplyr::select(burn_sev_category, gm_cover)
 
-GramBurnSevPlot <- ggplot(data=GramOnly, mapping = aes(x=burn_sev_category, y=gm_cover))+ 
+GramBurnPlot <- ggplot(data=GramOnly, mapping = aes(x=burn_sev_category, y=gm_cover))+ 
   geom_boxplot()
-GramBurnSevPlot
+GramBurnPlot
 ```
 
 # Forb ANOVA 
@@ -214,9 +214,9 @@ cld(emoutFB)
 ForbOnly <- ThesisAll1 %>% 
   dplyr::select(forest_type, fb_cover)
 
-ForbForestTypePlot <- ggplot(data=ForbOnly, mapping = aes(x=forest_type, y=fb_cover))+ 
+ForbForestPlot <- ggplot(data=ForbOnly, mapping = aes(x=forest_type, y=fb_cover))+ 
   geom_boxplot()
-ForbForestTypePlot 
+ForbForestPlot 
 ```
 
 
@@ -285,38 +285,75 @@ backSH <- emmeans(LMFitsqrtSH, pairwise ~ burn_sev_category*factor(forest_type),
 backSH
 ```
 
-
-
-
 # Confirmatory plots - shrub cover
 
 ```{r}
+ShrubOnly <- ThesisAll1 %>% 
+  dplyr::select(burn_sev_category, forest_type, sh_cover)
 
+ShrubForestPlot <- ggplot(data=ShrubOnly, mapping = aes(x=forest_type, y=sh_cover))+ 
+  geom_boxplot()
+
+ShrubBurnPlot <- ggplot(data=ShrubOnly, mapping = aes(x=burn_sev_category, y=sh_cover))+ 
+  geom_boxplot()
+ShrubForestPlot
+ShrubBurnPlot
 ```
 
 # Tree ANOVA 
 
 ```{r}
+# Tree ANOVA
+# hist(ThesisData$tr_cover)
+# LMFitTR <-
+#   lm(tr_cover ~ burn_sev_category * forest_type, data = ThesisData)
+# anova(LMFitTR)
+# par(mfrow = c(1, 2))
+# plot(LMFitTR, which = 1:2)
 
+# sqrt Tree ANOVA - not used
+ThesisAll1$sqrtTR <- sqrt(ThesisAll1$tr_cover)
+hist(ThesisAll1$sqrtTR)
+LMFitsqrtTR <- lm(sqrt(tr_cover) ~ burn_sev_category* factor(forest_type), data = ThesisAll1)
+anova(LMFitsqrtTR)
+par(mfrow = c(1, 2))
+plot(LMFitsqrtTR, which = 1:2)
+
+# log Tree ANOVA - Analysis used for presentation(s)
+# ThesisAll1$logTR <- log(ThesisAll1$tr_cover + 1)
+# hist(ThesisAll1$logTR)
+# LMFitLogTR <- lm(logTR ~ burn_sev_category * factor(forest_type), data = ThesisAll1)
+# anova(LMFitLogTR)
+# par(mfrow = c(1, 2))
+# plot(LMFitLogTR, which = 1:2)
 ```
 
 
 # Pairwise comparison tree ANOVA 
 
 ```{r}
-
+emoutTR <- emmeans(LMFitsqrtTR, ~ factor(forest_type))
+emoutTR
+pairs(emoutTR)
+cld(emoutTR)
 ```
 
 # Back transform trees 
 
 ```{r}
-
+backTR <- emmeans(LMFitsqrtTR, pairwise ~ forest_type, regrid = "response")
+backTR
 ```
 
 # Confirmatory plots - tree cover
 
 ```{r}
+TreeCoverOnly <- ThesisAll1 %>% 
+  dplyr::select(forest_type, tr_cover)
 
+TreeForestPlot <- ggplot(data=TreeCoverOnly, mapping = aes(x=forest_type, y=tr_cover))+ 
+  geom_boxplot()
+TreeForestPlot 
 ```
 
 
