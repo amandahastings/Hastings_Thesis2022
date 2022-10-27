@@ -110,7 +110,30 @@ ThesisSumstats <- ThesisAll1 %>%
 ## Summary statistics cover/densities 
 
 ```{r}
-
+ThesisSumSeedlings <- ThesisSeedRename %>% 
+  group_by(forest_type, burn_sev_category)%>%
+  summarize(POTR_mean = mean(POTR), 
+            POTR_sd = sd(POTR), 
+            QUGA_mean = mean(QUGA), 
+            QUGA_sd = sd(QUGA), 
+            RONE_mean = mean(RONE), 
+            RONE_sd = sd(RONE), 
+            PIPO_mean = mean(PIPO), 
+            PIPO_sd = sd(PIPO), 
+            PSME_mean = mean(PSME), 
+            PSME_sd = sd(PSME), 
+            ABCO_mean = mean(ABCO), 
+            ABCO_sd = sd(ABCO), 
+            PICO_mean = mean(PICO), 
+            PICO_sd = sd(PICO), 
+            PIFL_mean = mean(PIFL), 
+            PIFL_sd = sd(PIFL), 
+            PIAR_mean = mean(PIAR), 
+            PIAR_sd = sd(PIAR), 
+            ABLA_mean = mean(ABLA), 
+            ABLA_sd = sd(ABLA), 
+            PIEN_mean = mean(PIEN), 
+            PIEN_sd = sd(PIEN)) 
 ```
 
 ## Summary stats seedlings 
