@@ -77,7 +77,6 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 # Litter/woody debris: Mean/SD
 
 ThesisSumstats <- ThesisAll1 %>% 
-  filter(PlotID != 'LS02')%>% 
   dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, live_ba, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, CWD)%>%
   rowwise()%>%
   mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>%
