@@ -29,6 +29,11 @@ library(ggpubr)
 library(viridis)
 ```
 
+```{r}
+str(ThesisAll1)
+```
+
+
 ## Formatting raw thesis site data and seedlings data 
 
 ```{r}
@@ -72,14 +77,32 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 # Litter/woody debris: Mean/SD
 
 ThesisSumstats <- ThesisAll1 %>% 
-  dplyr::select(burn_sev_category, forest_type, field.elevation..m., heat_load, live_ba, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, CWD)%>%
+  filter(PlotID != 'LS02')%>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, live_ba, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, CWD)%>%
   rowwise()%>%
-  mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
-  mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
-  dplyr::select(!c(bg_cover:rk_cover))%>% 
-  dplyr::select(-barren_cover)
-
-  
+  mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>%
+  mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>%
+  dplyr::select(!c(bg_cover:rk_cover))%>%
+  dplyr::select(-barren_cover)%>%
+  group_by(forest_type, burn_sev_category)%>%
+  summarize(elevation_mean = mean(field.elevation..m.),
+            elevation_sd = sd(field.elevation..m.),
+            slope_mean = mean(slope....), 
+            slope_sd = sd(slope....), 
+            aspect_mean = mean(aspect_rescaled), 
+            aspect_sd = sd(aspect_rescaled),
+            heatload_mean = mean(heat_load),
+            heatload_sd = sd(heat_load),
+            heatload_max = max(heat_load),
+            heatload_min = min(heat_load),
+            liveba_mean = mean(live_ba),
+            liveba_sd = sd(live_ba),
+            canopy_mean = mean(canopy_cover),
+            canopy_sd = sd(canopy_cover),
+            CWD_mean = mean(CWD),
+            CWD_sd = sd(CWD),
+            orgcover_mean = mean(organic_cover),
+            orgcover_sd = sd(organic_cover))
 
 ```
 
