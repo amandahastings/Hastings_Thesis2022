@@ -149,6 +149,18 @@ ThesisAll1 <- ThesisAll1 %>%
   mutate("conifer_total" = rowSums(ThesisAll1[,conifer_list]))
 ```
 
+# Summary statistics of conifer/decid seedlings densities across sites
+
+
+```{r}
+ConiferDecidSumStats <- ThesisAll1 %>% 
+  group_by(forest_type, burn_sev_category)%>%
+  summarize(conifer_mean = mean(conifer_total), 
+            conifer_sd = sd(conifer_total), 
+            deciduous_mean = mean(deciduous_total), 
+            deciduous_sd = sd(deciduous_total)) 
+```
+
 
 #------------Conifer/decid analyses---------------------------------------------
 
@@ -199,5 +211,104 @@ emoutConifer <- emmeans(ConiferPoisson, ~burn_sev_category*forest_type, type= "r
 pairs(emoutConifer)
 cld(emoutConifer)
 ```
+
+
+#------------Seedlings and pre-fire basal area----------------------------------
+
+
+# Seedling presense/absense and pre-fire basal area 
+
+```{r}
+# PICO prefire basal area, seed source, seedlings
+PICOSeedPrefireBA <- ThesisAll1 %>%
+  mutate(
+    "prefire_seed_PICO" = case_when(
+      PICO_total != 0.0000 &
+        (PICO_dead_ba != 0.0000 | PICO_live_ba != 0.0000) ~ "Success",
+      PICO_total == 0.0000 &
+        (PICO_dead_ba != 0.0000 | PICO_live_ba != 0.0000) ~ "Failure",
+      PICO_total != 0.0000 &
+        (PICO_dead_ba == 0.0000 & PICO_live_ba == 0.0000) ~ "New", 
+      PICO_total == 0.0000 & PICO_dead_ba == 0.0000 & PICO_live_ba == 0.0000 ~ "NA")) %>% 
+  dplyr::select(forest_type, burn_sev_category, PICO_total, PICO_dead_ba, PICO_live_ba, PICO_seed_source, prefire_seed_PICO)
+ 
+ 
+# ABCO prefire basal area, seed source, seedlings
+ABCOSeedPrefireBA <- ThesisAll1 %>%
+  mutate(
+    "prefire_seed_ABCO" = case_when(
+      ABCO_total != 0.0000 &
+        (ABCO_dead_ba != 0.0000 | ABCO_live_ba != 0.0000) ~ "Success",
+      ABCO_total == 0.0000 &
+        (PICO_dead_ba != 0.0000 | ABCO_live_ba != 0.0000) ~ "Failure",
+      ABCO_total != 0.0000 &
+        (ABCO_dead_ba == 0.0000 & ABCO_live_ba == 0.0000) ~ "New", 
+      ABCO_total == 0.0000 & ABCO_dead_ba == 0.0000 & ABCO_live_ba == 0.0000 ~ "NA")) %>% 
+  dplyr::select(forest_type, burn_sev_category, ABCO_total, ABCO_dead_ba, ABCO_live_ba, ABCO_seed_source, prefire_seed_ABCO)
+  
+
+# PSME prefire basal area, seed source, seedlings
+PSMESeedPrefireBA <- ThesisAll1 %>%  
+   mutate(
+    "prefire_seed_PSME" = case_when(
+      PSME_total != 0.0000 &
+        (PSME_dead_ba != 0.0000 | PSME_live_ba != 0.0000) ~ "Success",
+      PSME_total == 0.0000 &
+        (PSME_dead_ba != 0.0000 | PSME_live_ba != 0.0000) ~ "Failure",
+      PSME_total != 0.0000 &
+        (PSME_dead_ba == 0.0000 & PSME_live_ba == 0.0000) ~ "New", 
+      PSME_total == 0.0000 & PSME_dead_ba == 0.0000 & PSME_live_ba == 0.0000 ~ "NA"))%>% 
+  dplyr::select(forest_type, burn_sev_category, PSME_total, PSME_dead_ba, PSME_live_ba, PSME_seed_source, prefire_seed_PSME)
+  
+   
+# PIFL prefire basal area, seed source, seedlings
+PIFLSeedPrefireBA <- ThesisAll1 %>%
+   mutate(
+    "prefire_seed_PIFL" = case_when(
+      PIFL_total != 0.0000 &
+        (PIFL_dead_ba != 0.0000 | PIFL_live_ba != 0.0000) ~ "Success",
+      PIFL_total == 0.0000 &
+        (PIFL_dead_ba != 0.0000 | PIFL_live_ba != 0.0000) ~ "Failure",
+      PIFL_total != 0.0000 &
+        (PIFL_dead_ba == 0.0000 & PIFL_live_ba == 0.0000) ~ "New", 
+      PIFL_total == 0.0000 & PIFL_dead_ba == 0.0000 & PIFL_live_ba == 0.0000 ~ "NA")) %>%
+  dplyr::select(forest_type, burn_sev_category, PIFL_total, PIFL_dead_ba, PIFL_live_ba, PIFL_seed_source, prefire_seed_PIFL)
+
+
+# PIAR prefire basal area, seed source, seedlings
+PIARSeedPrefireBA <- ThesisAll1 %>%
+     mutate(
+    "prefire_seed_PIAR" = case_when(
+      PIAR_total != 0.0000 &
+        (PIAR_dead_ba != 0.0000 | PIAR_live_ba != 0.0000) ~ "Success",
+      PIAR_total == 0.0000 &
+        (PIAR_dead_ba != 0.0000 | PIAR_live_ba != 0.0000) ~ "Failure",
+      PIAR_total != 0.0000 &
+        (PIAR_dead_ba == 0.0000 & PIAR_live_ba == 0.0000) ~ "New", 
+      PIAR_total == 0.0000 & PIAR_dead_ba == 0.0000 & PIAR_live_ba == 0.0000 ~ "NA")) %>%
+  dplyr::select(forest_type, burn_sev_category, PIAR_total, PIAR_dead_ba, PIAR_live_ba, PIAR_seed_source, prefire_seed_PIAR)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

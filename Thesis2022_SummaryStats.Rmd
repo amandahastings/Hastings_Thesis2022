@@ -106,7 +106,7 @@ ThesisSumstats <- ThesisAll1 %>%
 ```
 
 
-## Summary statistics cover/densities 
+## Summary statistics seedling densities 
 
 ```{r}
 ThesisSumSeedlings <- ThesisSeedRename %>% 
