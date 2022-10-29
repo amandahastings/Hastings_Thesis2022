@@ -4,7 +4,7 @@ author: "Amanda Hastings"
 date: "2022-09-19"
 output: html_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -149,6 +149,7 @@ ThesisAll1 <- ThesisAll1 %>%
   mutate("conifer_total" = rowSums(ThesisAll1[,conifer_list]))
 ```
 
+
 # Summary statistics of conifer/decid seedlings densities across sites
 
 
@@ -159,6 +160,15 @@ ConiferDecidSumStats <- ThesisAll1 %>%
             conifer_sd = sd(conifer_total), 
             deciduous_mean = mean(deciduous_total), 
             deciduous_sd = sd(deciduous_total)) 
+
+length(which(ThesisAll1$conifer_total != 0.0000 & ThesisAll1$burn_sev_category == "Low"))
+length(which(ThesisAll1$conifer_total != 0.0000 & ThesisAll1$burn_sev_category == "High"))
+length(which(ThesisAll1$deciduous_total != 0.0000 & ThesisAll1$forest_type == "Lower Montane"))
+length(which(ThesisAll1$deciduous_total != 0.0000 & ThesisAll1$forest_type == "Upper Montane"))
+length(which(ThesisAll1$deciduous_total != 0.0000 & ThesisAll1$forest_type == "Subalpine"))
+
+length(which(ThesisAll1$QUGA_total != 0.0000 & ThesisAll1$forest_type == "Lower Montane"))
+length(which(ThesisAll1$QUGA_total != 0.0000 & ThesisAll1$forest_type == "Upper Montane"))
 ```
 
 
@@ -216,7 +226,7 @@ cld(emoutConifer)
 #------------Seedlings and pre-fire basal area----------------------------------
 
 
-# Seedling presense/absense and pre-fire basal area 
+# Conifer seedling presense/absense and pre-fire basal area 
 
 ```{r}
 # PICO prefire basal area, seed source, seedlings
@@ -291,7 +301,50 @@ PIARSeedPrefireBA <- ThesisAll1 %>%
 ```
 
 
+# Deciduous seedling presense/absense and pre-fire basal area 
 
+```{r}
+# POTR prefire basal area, seed source, seedlings
+POTRSeedPrefireBA <- ThesisAll1 %>%  
+   mutate(
+    "prefire_seed_POTR" = case_when(
+      POTR_total != 0.0000 &
+        (POTR_dead_ba != 0.0000 | POTR_live_ba != 0.0000) ~ "Success",
+      POTR_total == 0.0000 &
+        (POTR_dead_ba != 0.0000 | POTR_live_ba != 0.0000) ~ "Failure",
+      POTR_total != 0.0000 &
+        (POTR_dead_ba == 0.0000 & POTR_live_ba == 0.0000) ~ "New", 
+      POTR_total == 0.0000 & POTR_dead_ba == 0.0000 & POTR_live_ba == 0.0000 ~ "NA"))%>% 
+  dplyr::select(forest_type, burn_sev_category, POTR_total, POTR_dead_ba, POTR_live_ba, POTR_seed_source, prefire_seed_POTR)
+  
+   
+# # QUGA prefire basal area, seed source, seedlings
+# QUGASeedPrefireBA <- ThesisAll1 %>%
+#    mutate(
+#     "prefire_seed_QUGA" = case_when(
+#       QUGA_total != 0.0000 &
+#         (QUGA_dead_ba != 0.0000 | QUGA_live_ba != 0.0000) ~ "Success",
+#       QUGA_total == 0.0000 &
+#         (QUGA_dead_ba != 0.0000 | QUGA_live_ba != 0.0000) ~ "Failure",
+#       QUGA_total != 0.0000 &
+#         (QUGA_dead_ba == 0.0000 & QUGA_live_ba == 0.0000) ~ "New", 
+#       QUGA_total == 0.0000 & QUGA_dead_ba == 0.0000 & QUGAL_live_ba == 0.0000 ~ "NA")) %>%
+#   dplyr::select(forest_type, burn_sev_category, QUGA_total, QUGA_dead_ba, QUGA_live_ba, QUGA_seed_source, prefire_seed_QUGA)
+
+
+# # RONE prefire basal area, seed source, seedlings
+# RONESeedPrefireBA <- ThesisAll1 %>%
+#      mutate(
+#     "prefire_seed_RONE" = case_when(
+#       RONE_total != 0.0000 &
+#         (PIAR_dead_ba != 0.0000 | RONE_live_ba != 0.0000) ~ "Success",
+#       RONE_total == 0.0000 &
+#         (PIAR_dead_ba != 0.0000 | RONE_live_ba != 0.0000) ~ "Failure",
+#       RONE_total != 0.0000 &
+#         (PIAR_dead_ba == 0.0000 & RONE_live_ba == 0.0000) ~ "New", 
+#       RONE_total == 0.0000 & RONE_dead_ba == 0.0000 & RONE_live_ba == 0.0000 ~ "NA")) %>%
+#   dplyr::select(forest_type, burn_sev_category, RONE_total, RONE_dead_ba, RONE_live_ba, RONE_seed_source, prefire_seed_RONE)
+```
 
 
 
