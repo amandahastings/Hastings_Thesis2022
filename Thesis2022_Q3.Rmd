@@ -816,7 +816,7 @@ UpperMontaneNMDSplot <- ggplot() +
     check_overlap = T,
     fontface = "italic",
     size = 4,
-    nudge_x = -0.15,
+    nudge_x = -0.13,
     nudge_y = 0.015,
     vjust = 0.5,
     #Pushes label away from the arrow
@@ -848,6 +848,8 @@ UpperMontaneNMDSplot <- ggplot() +
     check_overlap = F,
     fontface = "bold",
     size = 3.25,
+    nudge_y = -0.015,
+    nudge_x = -0.015,
     #Pushes label away from the arrow
     mapping = aes(
       label = Label,
@@ -944,6 +946,7 @@ SubalpineNMDSplot <- ggplot() +
     check_overlap = F,
     fontface = "bold",
     size = 3.25,
+    nudge_x = -0.005,
     #Pushes label away from the arrow
     mapping = aes(
       label = Label,
