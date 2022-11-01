@@ -316,7 +316,7 @@ max_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 #OVerlay predictors data frame 
 OverlayPredictors1 <- ThesisAll1 %>% 
   # dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
-  dplyr::select(PlotID, burn_sev_category, forest_type, heat_load, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, CWD)%>%
+  dplyr::select(PlotID, burn_sev_category, forest_type, heat_load, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, CWD, PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>%
   rowwise()%>%
   mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
   mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
@@ -328,7 +328,8 @@ OverlayPredictors1 <- ThesisAll1 %>%
 OverlayPred_LowerMontane <- OverlayPredictors1 %>% 
   filter(forest_type == "Lower Montane")%>% 
   filter(!PlotID %in% 'LS02')%>%
-  dplyr::select(!c(forest_type, barren_cover)) %>% 
+  dplyr::select(!c(forest_type, barren_cover, PIFL_seed_source, PIAR_seed_source)) %>% 
+  replace(is.na(.),1000)%>%
   # mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   # replace(is.na(.),0)%>%
   remove_rownames %>%
@@ -347,9 +348,10 @@ OverlayPred_LowerMontane <- OverlayPredictors1 %>%
 #Overlay Predictors Upper Montane 
 OverlayPred_UpperMontane <- OverlayPredictors1 %>% 
   filter(forest_type == "Upper Montane")%>% 
-  dplyr::select(!c(forest_type, barren_cover)) %>% 
+  dplyr::select(!c(forest_type, barren_cover, PIAR_seed_source)) %>% 
   # mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   # replace(is.na(.),0)%>%
+  replace(is.na(.),1000)%>%
   remove_rownames %>%
   column_to_rownames(var="PlotID")
   # rename("Elevation" = field.elevation..m.,
@@ -368,6 +370,7 @@ OverlayPred_UpperMontane <- OverlayPredictors1 %>%
 OverlayPred_Subalpine <- OverlayPredictors1 %>% 
   filter(forest_type == "Subalpine")%>% 
   dplyr::select(!c(forest_type, canopy_cover, barren_cover, CWD)) %>% 
+  replace(is.na(.),1000)%>%
   # mutate(across(avg_seed_source:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   # replace(is.na(.),0)%>%
   remove_rownames %>%
@@ -387,42 +390,42 @@ OverlayPred_Subalpine <- OverlayPredictors1 %>%
 ## Overlay, distance to seed source by species per forest type 
 
 ```{r}
-
-OverlaySeedSource <- ThesisAll1 %>%
-  dplyr::select(PlotID,
-                burn_sev_category,
-                forest_type,
-                PIPO_seed_source:PIEN_seed_source)
-
-#Lower Montane
-OverlaySeed_LowerMontane <- OverlaySeedSource %>%
-  filter(forest_type == "Lower Montane")%>% 
-  dplyr::select(PlotID,
-                burn_sev_category,
-                forest_type,
-                PSME_seed_source, PICO_seed_source)%>% 
-  remove_rownames %>%
-  column_to_rownames(var="PlotID")
-
-#Upper Montane 
-OverlaySeed_UpperMontane <- OverlaySeedSource %>%
-  filter(forest_type == "Upper Montane")%>% 
-  dplyr::select(PlotID,
-                burn_sev_category,
-                forest_type,
-                PSME_seed_source, PICO_seed_source, PIFL_seed_source)%>% 
-  remove_rownames %>%
-  column_to_rownames(var="PlotID")
-
-#Subalpine 
-OverlaySeed_Subalpine <- OverlaySeedSource %>% 
-  filter(forest_type == "Subalpine")%>% 
-  dplyr::select(PlotID,
-                burn_sev_category,
-                forest_type,
-                PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>% 
-  remove_rownames %>%
-  column_to_rownames(var="PlotID")
+# 
+# OverlaySeedSource <- ThesisAll1 %>%
+#   dplyr::select(PlotID,
+#                 burn_sev_category,
+#                 forest_type,
+#                 PIPO_seed_source:PIEN_seed_source)
+# 
+# #Lower Montane
+# OverlaySeed_LowerMontane <- OverlaySeedSource %>%
+#   filter(forest_type == "Lower Montane")%>% 
+#   dplyr::select(PlotID,
+#                 burn_sev_category,
+#                 forest_type,
+#                 PSME_seed_source, PICO_seed_source)%>% 
+#   remove_rownames %>%
+#   column_to_rownames(var="PlotID")
+# 
+# #Upper Montane 
+# OverlaySeed_UpperMontane <- OverlaySeedSource %>%
+#   filter(forest_type == "Upper Montane")%>% 
+#   dplyr::select(PlotID,
+#                 burn_sev_category,
+#                 forest_type,
+#                 PSME_seed_source, PICO_seed_source, PIFL_seed_source)%>% 
+#   remove_rownames %>%
+#   column_to_rownames(var="PlotID")
+# 
+# #Subalpine 
+# OverlaySeed_Subalpine <- OverlaySeedSource %>% 
+#   filter(forest_type == "Subalpine")%>% 
+#   dplyr::select(PlotID,
+#                 burn_sev_category,
+#                 forest_type,
+#                 PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>% 
+#   remove_rownames %>%
+#   column_to_rownames(var="PlotID")
 
 ```
 
