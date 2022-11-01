@@ -316,7 +316,7 @@ max_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 #OVerlay predictors data frame 
 OverlayPredictors1 <- ThesisAll1 %>% 
   # dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
-  dplyr::select(PlotID, burn_sev_category, forest_type, heat_load, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, CWD, PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>%
+  dplyr::select(PlotID, burn_sev_category, forest_type, heat_load, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, CWD, conifer_seed_source, PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>%
   rowwise()%>%
   mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
   mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
@@ -328,7 +328,7 @@ OverlayPredictors1 <- ThesisAll1 %>%
 OverlayPred_LowerMontane <- OverlayPredictors1 %>% 
   filter(forest_type == "Lower Montane")%>% 
   filter(!PlotID %in% 'LS02')%>%
-  dplyr::select(!c(forest_type, barren_cover, PIFL_seed_source, PIAR_seed_source)) %>% 
+  dplyr::select(!c(forest_type, barren_cover, PIFL_seed_source, PIAR_seed_source, PICO_seed_source)) %>% 
   replace(is.na(.),1000)%>%
   # mutate(across(canopy_cover:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   # replace(is.na(.),0)%>%
@@ -369,7 +369,7 @@ OverlayPred_UpperMontane <- OverlayPredictors1 %>%
 #Overlay Predictors Subalpine
 OverlayPred_Subalpine <- OverlayPredictors1 %>% 
   filter(forest_type == "Subalpine")%>% 
-  dplyr::select(!c(forest_type, canopy_cover, barren_cover, CWD)) %>% 
+  dplyr::select(!c(forest_type, canopy_cover, barren_cover, CWD, PICO_seed_source)) %>% 
   replace(is.na(.),1000)%>%
   # mutate(across(avg_seed_source:organic_cover,~as.numeric(scale(.)), .names = 'z_{col}')) %>%
   # replace(is.na(.),0)%>%
@@ -491,11 +491,125 @@ EnvFit_Subalpine <- envfit(NMDS_Subalpine, OverlayPred_Subalpine)
 EnvFit_Subalpine
 ```
 
+## Data frames for only significant overlay environmental variables 
+
+```{r}
+# #Overlay Predictors Lower Montane 
+SignifOverlay_LowerMontane <- OverlayPred_LowerMontane %>%
+  dplyr::select(live_ba, organic_cover)
+
+
+#Overlay Predictors Upper Montane
+SignifOverlay_UpperMontane <- OverlayPred_UpperMontane %>%
+  dplyr::select(canopy_cover, organic_cover)
+
+
+#Overlay Predictors Subalpine
+SignifOverlay_Subalpine <- OverlayPred_Subalpine %>% 
+  dplyr::select(heat_load)
+```
+
+## Fitting signficant environmental variables 
+
+```{r}
+
+#Lower Montane env fit 
+SignifEnvFit_LowerMontane <- envfit(NMDS_LowerMontane, SignifOverlay_LowerMontane)
+# plot(EnvFit_LowerMontane)
+SignifEnvFit_LowerMontane
+
+#Upper Montane env fit 
+SignifEnvFit_UpperMontane <- envfit(NMDS_UpperMontane, SignifOverlay_UpperMontane)
+# plot(EnvFit_UpperMontane)
+SignifEnvFit_UpperMontane
+
+#Subalpine env fit 
+SignifEnvFit_Subalpine <- envfit(NMDS_Subalpine, SignifOverlay_Subalpine)
+# plot(EnvFit_Subalpine)
+SignifEnvFit_Subalpine
+```
+
+
 ## Plots using ggvegan 
 
 ## Fitting env fit vectors to plot  
 
 ```{r}
+# #Lower Montane EnvFit df for plotting
+# LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "sites"))
+# 
+# 
+# # Burn severity as factor 
+# # LowerMontane.env.scores1 <- as.data.frame(scores(EnvFit_LowerMontane, display = "factors"))
+# # LowerMontane.env.scores1 <- cbind(LowerMontane.env.scores1, EnvPred = rownames(LowerMontane.env.scores1))
+# 
+# LowerMontane.env.scoresdf <-
+#   as.data.frame(scores(EnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(EnvFit_LowerMontane)
+# 
+# LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
+# 
+# # LowerMontane.env.scoresdf <- rbind(LowerMontane.env.scoresdf, LowerMontane.env.scores1)
+# 
+# LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>% 
+#   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
+#                                 EnvPred == "heat_load" ~ "Heat Load", 
+#                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
+#                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+#                                 EnvPred == "live_ba" ~ "Live Basal Area", 
+#                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+#                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+#                                 EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
+#   filter(!is.na(EnvPred2))
+#          
+# #Upper Montane EnvFit df for plotting
+# UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
+# 
+# UpperMontane.env.scoresdf <-
+#   as.data.frame(scores(EnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(EnvFit_UpperMontane)
+# 
+# UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
+# 
+# UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>% 
+#   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
+#                                 EnvPred == "heat_load" ~ "Heat Load", 
+#                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
+#                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+#                                 EnvPred == "live_ba" ~ "Live Basal Area", 
+#                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+#                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+#                                 EnvPred == "CWD" ~ "Coarse Woody Debris"))%>% 
+#   filter(!is.na(EnvPred2))
+#   
+#          
+# 
+# 
+# #Subalpine EnvFit df for plotting
+# Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
+# 
+# Subalpine.env.scoresdf <-
+#   as.data.frame(scores(EnvFit_Subalpine, display = "vectors")) * ordiArrowMul(EnvFit_Subalpine)
+# 
+# Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
+# 
+# Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>% 
+#   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
+#                                 EnvPred == "heat_load" ~ "Heat Load", 
+#                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
+#                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+#                                 EnvPred == "live_ba" ~ "Live Basal Area", 
+#                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+#                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>% 
+#   filter(!is.na(EnvPred2))
+#   
+         
+```
+
+
+## Fitting only signficant env vectors to plot
+
+```{r}
+##-----------------------Lower Montane------------------------------------------
+
 #Lower Montane EnvFit df for plotting
 LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "sites"))
 
@@ -504,66 +618,51 @@ LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "s
 # LowerMontane.env.scores1 <- as.data.frame(scores(EnvFit_LowerMontane, display = "factors"))
 # LowerMontane.env.scores1 <- cbind(LowerMontane.env.scores1, EnvPred = rownames(LowerMontane.env.scores1))
 
-LowerMontane.env.scoresdf <-
-  as.data.frame(scores(EnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(EnvFit_LowerMontane)
+#Stores scores as column in dataframe
+#OrdiArrowMul makes arrow size proportional
+LowerMontane.sig.env.scoresdf <-
+  as.data.frame(scores(SignifEnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(SignifEnvFit_LowerMontane)
 
-LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
+#Add site number back as column 
+LowerMontane.sig.env.scoresdf <- cbind(LowerMontane.sig.env.scoresdf, EnvPred = rownames(LowerMontane.sig.env.scoresdf))
 
 # LowerMontane.env.scoresdf <- rbind(LowerMontane.env.scoresdf, LowerMontane.env.scores1)
 
-LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>% 
-  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
-                                EnvPred == "heat_load" ~ "Heat Load", 
-                                EnvPred == "canopy_cover" ~ "Canopy Cover", 
-                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
-                                EnvPred == "live_ba" ~ "Live Basal Area", 
-                                EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
-                                EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
-  filter(!is.na(EnvPred2))
-         
+LowerMontane.sig.env.scoresdf <- LowerMontane.sig.env.scoresdf %>% 
+  mutate("EnvPred2" = case_when(EnvPred == "live_ba" ~ "Live Basal Area", 
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
+
+##-----------------------Upper Montane------------------------------------------
+
 #Upper Montane EnvFit df for plotting
 UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
 
-UpperMontane.env.scoresdf <-
-  as.data.frame(scores(EnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(EnvFit_UpperMontane)
+UpperMontane.sig.env.scoresdf <-
+  as.data.frame(scores(SignifEnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(SignifEnvFit_UpperMontane)
 
-UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
+UpperMontane.sig.env.scoresdf <- cbind(UpperMontane.sig.env.scoresdf, EnvPred = rownames(UpperMontane.sig.env.scoresdf))
 
-UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>% 
-  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
-                                EnvPred == "heat_load" ~ "Heat Load", 
-                                EnvPred == "canopy_cover" ~ "Canopy Cover", 
-                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
-                                EnvPred == "live_ba" ~ "Live Basal Area", 
-                                EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
-                                EnvPred == "CWD" ~ "Coarse Woody Debris"))%>% 
-  filter(!is.na(EnvPred2))
-  
-         
+UpperMontane.sig.env.scoresdf <- UpperMontane.sig.env.scoresdf%>% 
+  mutate("EnvPred2" = case_when(EnvPred == "canopy_cover" ~ "Canopy Cover", 
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris"))
 
+##-----------------------Upper Montane------------------------------------------                               
 
 #Subalpine EnvFit df for plotting
 Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
 
-Subalpine.env.scoresdf <-
-  as.data.frame(scores(EnvFit_Subalpine, display = "vectors")) * ordiArrowMul(EnvFit_Subalpine)
+Subalpine.sig.env.scoresdf <-
+  as.data.frame(scores(SignifEnvFit_Subalpine, display = "vectors")) * ordiArrowMul(SignifEnvFit_Subalpine)
 
-Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
+Subalpine.sig.env.scoresdf <- cbind(Subalpine.sig.env.scoresdf, EnvPred = rownames(Subalpine.sig.env.scoresdf))
 
-Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>% 
-  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
-                                EnvPred == "heat_load" ~ "Heat Load", 
-                                EnvPred == "canopy_cover" ~ "Canopy Cover", 
-                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
-                                EnvPred == "live_ba" ~ "Live Basal Area", 
-                                EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>% 
-  filter(!is.na(EnvPred2))
-  
-         
+Subalpine.sig.env.scoresdf <- Subalpine.sig.env.scoresdf%>% 
+  mutate("EnvPred2" = case_when(EnvPred == "heat_load" ~ "Heat Load"))
+
+                                
+
 ```
+
 
 
 ## Lower Montane plot 
