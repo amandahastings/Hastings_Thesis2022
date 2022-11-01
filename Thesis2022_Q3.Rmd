@@ -745,8 +745,8 @@ LowerMontaneNMDSplot <- ggplot() +
     #Pushes label away from the arrow
     mapping = aes(
       label = Label,
-      x = NMDS1 * 1.1,
-      y = NMDS2 * 1.1
+      x = NMDS1,
+      y = NMDS2,
     )
   ) +
   theme_few() +
@@ -942,8 +942,8 @@ SubalpineNMDSplot <- ggplot() +
     #Pushes label away from the arrow
     mapping = aes(
       label = Label,
-      x = NMDS1 * 1.1,
-      y = NMDS2 * 1.1
+      x = NMDS1,
+      y = NMDS2
     )
   ) +
   theme_few() +
