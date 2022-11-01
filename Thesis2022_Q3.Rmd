@@ -912,7 +912,7 @@ SubalpineNMDSplot <- ggplot() +
     check_overlap = T,
     fontface = "italic",
     size = 4,
-    nudge_x = -0.05,
+    nudge_x = 0.005,
     nudge_y = 0.035,
     vjust = 0.5,
     #Pushes label away from the arrow
