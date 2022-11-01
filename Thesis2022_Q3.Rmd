@@ -621,7 +621,9 @@ LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "s
 #Stores scores as column in dataframe
 #OrdiArrowMul makes arrow size proportional
 LowerMontane.sig.env.scoresdf <-
-  as.data.frame(scores(SignifEnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(SignifEnvFit_LowerMontane)
+  as.data.frame(scores(SignifEnvFit_LowerMontane, display = "vectors")) 
+
+# * ordiArrowMul(SignifEnvFit_LowerMontane)
 
 #Add site number back as column 
 LowerMontane.sig.env.scoresdf <- cbind(LowerMontane.sig.env.scoresdf, EnvPred = rownames(LowerMontane.sig.env.scoresdf))
@@ -638,7 +640,8 @@ LowerMontane.sig.env.scoresdf <- LowerMontane.sig.env.scoresdf %>%
 UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
 
 UpperMontane.sig.env.scoresdf <-
-  as.data.frame(scores(SignifEnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(SignifEnvFit_UpperMontane)
+  as.data.frame(scores(SignifEnvFit_UpperMontane, display = "vectors"))
+# *  ordiArrowMul(SignifEnvFit_UpperMontane)
 
 UpperMontane.sig.env.scoresdf <- cbind(UpperMontane.sig.env.scoresdf, EnvPred = rownames(UpperMontane.sig.env.scoresdf))
 
@@ -652,7 +655,8 @@ UpperMontane.sig.env.scoresdf <- UpperMontane.sig.env.scoresdf%>%
 Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
 
 Subalpine.sig.env.scoresdf <-
-  as.data.frame(scores(SignifEnvFit_Subalpine, display = "vectors")) * ordiArrowMul(SignifEnvFit_Subalpine)
+  as.data.frame(scores(SignifEnvFit_Subalpine, display = "vectors"))
+#  * ordiArrowMul(SignifEnvFit_Subalpine)
 
 Subalpine.sig.env.scoresdf <- cbind(Subalpine.sig.env.scoresdf, EnvPred = rownames(Subalpine.sig.env.scoresdf))
 
@@ -742,6 +746,7 @@ LowerMontaneNMDSplot <- ggplot() +
     check_overlap = F,
     fontface = "bold",
     size = 3.25,
+    nudge_y = -0.025,
     #Pushes label away from the arrow
     mapping = aes(
       label = Label,
@@ -942,7 +947,7 @@ SubalpineNMDSplot <- ggplot() +
     #Pushes label away from the arrow
     mapping = aes(
       label = Label,
-      x = NMDS1,
+      x = NMDS1 ,
       y = NMDS2
     )
   ) +
