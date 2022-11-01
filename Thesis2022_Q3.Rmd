@@ -692,6 +692,9 @@ ggplot() +
     shape = "circle",
     stroke = 1,
     mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+  scale_color_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
   geom_segment(
     data = LowerMontane.sig.env.scoresdf,
     aes(
@@ -720,7 +723,7 @@ ggplot() +
     colour = "gray"
   ) +
 
-  labs(title = "Lower Montane", color = "Burn Severity") +
+  labs(title = "Lower Montane") +
   geom_text(
     data = subset(fort_LowerMontane, Score == 'species'),
     check_overlap = F,
@@ -775,6 +778,9 @@ ggplot() +
     shape = "circle",
     stroke = 1,
     mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+  scale_color_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
   geom_segment(
     data = UpperMontane.sig.env.scoresdf,
     aes(
@@ -803,7 +809,7 @@ ggplot() +
     colour = "gray"
   ) +
 
-  labs(title = "Upper Montane", color = "Burn Severity") +
+  labs(title = "Upper Montane") +
   geom_text(
     data = subset(fort_UpperMontane, Score == 'species'),
     check_overlap = F,
@@ -853,6 +859,9 @@ ggplot() +
     shape = "circle",
     stroke = 1,
     mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+  scale_color_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
   geom_segment(
     data = Subalpine.sig.env.scoresdf,
     aes(
@@ -881,7 +890,7 @@ ggplot() +
     colour = "gray"
   ) +
 
-  labs(title = "Subalpine", color = "Burn Severity") +
+  labs(title = "Subalpine") +
   geom_text(
     data = subset(fort_Subalpine, Score == 'species'),
     check_overlap = F,
