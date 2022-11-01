@@ -93,7 +93,7 @@ PlantCoverPlot <- ggplot(
   theme_few()+
   scale_fill_manual(
     name = "Burn Severity",
-    labels = c("Low", "High"), values=c("#fd8d3c","#bd0026"))+
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
   theme(axis.text.x = element_text(
     color = "black",
     size = 9,
@@ -108,6 +108,7 @@ PlantCoverPlot <- ggplot(
   legend.text = element_text(size =9)) + 
   scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
   scale_y_continuous(labels = percent)
+
 PlantCoverPlot 
 
 ```
