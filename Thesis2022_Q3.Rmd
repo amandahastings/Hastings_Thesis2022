@@ -437,8 +437,9 @@ OverlayPred_Subalpine <- OverlayPredictors1 %>%
 #NMDS Lower Montane 
 NMDS_LowerMontane <- metaMDS(max_NMDSdf_LowerMontane, distance = "euclidean", autotransform = F, wascores=T)
 ordiplot(NMDS_LowerMontane, type="t", main = "Lower Montane")
-str(NMDS_LowerMontane)
+# str(NMDS_LowerMontane)
 vegan:: stressplot(NMDS_LowerMontane)
+NMDS_LowerMontane
 
 # plot(NMDS_LowerMontane, type = "n")
 # points(NMDS_LowerMontane, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")
@@ -448,14 +449,17 @@ vegan:: stressplot(NMDS_LowerMontane)
 #NMDS Upper Montane 
 NMDS_UpperMontane <- metaMDS(max_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F, wascores = T)
 ordiplot(NMDS_UpperMontane, type = 't', main = "Upper Montane")
-str(NMDS_UpperMontane)
+# str(NMDS_UpperMontane)
 vegan:: stressplot(NMDS_UpperMontane)
+NMDS_UpperMontane
+
 
 #NMDS Subalpine 
 NMDS_Subalpine <- metaMDS(max_NMDSdf_Subalpine, distance = "euclidean", k=2, autotransform = F, wascores = T)
 ordiplot(NMDS_Subalpine, type = 't', main = "Subalpine")
-str(NMDS_Subalpine)
+# str(NMDS_Subalpine)
 vegan:: stressplot(NMDS_Subalpine)
+NMDS_Subalpine
 
 ```
 
