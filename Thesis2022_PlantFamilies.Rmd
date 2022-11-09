@@ -10,6 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
+
 #Load libraries
 library(tidyverse)
 library(dplyr)
@@ -24,11 +29,57 @@ library(ggpubr)
 library(viridis)
 ```
 
+## Formatting raw thesis site data and seedlings data 
+
+```{r}
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+ThesisSeedlings <- ThesisSeedlingsData %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
+  select_if(~!any(is.na(.)))
+
+```
+
+## Combining site data with seedlings data
+
+```{r}
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))
+```
+
+## Add in plant family data frame 
+
 ```{r}
 #Load plant family data 
 families_data <- read.csv("HastingsA_FamilyCounts_11.7.22.csv")
 
-rm(families_plotID)
-  
+families_data <- families_data %>% 
+  mutate("percent_cover" = Count/127)
+
+n_distinct(families_data$PlotID)
 ```
+
+
+## Append burn severity and forest type to PlotID
+
+```{r}
+PlotCat <- ThesisAll1 %>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type)%>% 
+  filter(!PlotID %in% "LS30")
+
+#Append categories to PlotID in plant family dataframe 
+families_data <- left_join(families_data, PlotCat, by = "PlotID")
+```
+
+
+
+
+
+
+
+
 
