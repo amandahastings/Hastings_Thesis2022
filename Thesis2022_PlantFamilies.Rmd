@@ -208,6 +208,7 @@ PlantFamily_ForestFacet <- ggplot(
 PlantFamily_ForestFacet
 
 ```
+
 ## Separating by forest type 
 
 ```{r}
@@ -225,7 +226,109 @@ families_subalpine <- families_sumstats %>%
 ```
 
 
+```{r}
+#Plant family plot by forest type facet 
+Subalpine_families <- ggplot(
+  families_subalpine,
+  aes(x = Family,
+      y = mean_percent_cover)
+) +
+  geom_boxplot() +
+  labs(x = "Plant Family",
+       y = "Percent Cover") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(1, "cm")) +
+  theme_few()+
+  # scale_fill_manual(
+  #   name = "Burn Severity",
+  #   labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  theme(axis.text.x = element_text(
+    color = "black",
+    size = 7,
+    angle = 90,
+    vjust = .8,
+    hjust = .8
+  ),
+  axis.title.x = element_text(size = 11),
+  axis.title.y = element_text(size = 11),
+  axis.text.y = element_text(size = 8),
+  legend.title = element_text(size = 9), 
+  legend.text = element_text(size =9)) + 
+  # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
+  scale_y_continuous(labels = percent)
+
+Subalpine_families
+```
 
 
 
+```{r}
+#Plant family plot by forest type facet 
+Uppermontane_families <- ggplot(
+  families_uppermontane,
+  aes(x = Family,
+      y = mean_percent_cover)
+) +
+  geom_boxplot() +
+  labs(x = "Plant Family",
+       y = "Percent Cover") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(1, "cm")) +
+  theme_few()+
+  # scale_fill_manual(
+  #   name = "Burn Severity",
+  #   labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  theme(axis.text.x = element_text(
+    color = "black",
+    size = 7,
+    angle = 90,
+    vjust = .8,
+    hjust = .8
+  ),
+  axis.title.x = element_text(size = 11),
+  axis.title.y = element_text(size = 11),
+  axis.text.y = element_text(size = 8),
+  legend.title = element_text(size = 9), 
+  legend.text = element_text(size =9)) + 
+  # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
+  scale_y_continuous(labels = percent)
+
+Uppermontane_families
+```
+
+
+
+```{r}
+#Plant family plot by forest type facet 
+Lowermontane_families <- ggplot(
+  families_lowermontane,
+  aes(x = Family,
+      y = mean_percent_cover)
+) +
+  geom_boxplot() +
+  labs(x = "Plant Family",
+       y = "Percent Cover") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(1, "cm")) +
+  theme_few()+
+  # scale_fill_manual(
+  #   name = "Burn Severity",
+  #   labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  theme(axis.text.x = element_text(
+    color = "black",
+    size = 7,
+    angle = 90,
+    vjust = .8,
+    hjust = .8
+  ),
+  axis.title.x = element_text(size = 11),
+  axis.title.y = element_text(size = 11),
+  axis.text.y = element_text(size = 8),
+  legend.title = element_text(size = 9), 
+  legend.text = element_text(size =9)) + 
+  # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
+  scale_y_continuous(labels = percent)
+
+Lowermontane_families
+```
 
