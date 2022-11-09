@@ -84,7 +84,6 @@ PlantCoverPlot <- ggplot(
   geom_boxplot() + 
   # ylim(0, 0.6) +
   facet_wrap(~ forest_type) +
-  theme_classic() +
   labs(x = "Functional Group",
        y = "Percent Cover",
        fill = "Burn Severity") +
