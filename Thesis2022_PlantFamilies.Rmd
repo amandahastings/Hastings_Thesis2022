@@ -3,6 +3,8 @@ title: "Thesis2022_PlantFamilies"
 author: "Amanda Hastings"
 date: "2022-11-08"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -27,6 +29,7 @@ library(vegan)
 library(ggvegan)
 library(ggpubr)
 library(viridis)
+library(scales)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -81,7 +84,7 @@ families_sumstats <- families_data %>%
     forest_type,
     levels = c("Lower Montane", "Upper Montane","Subalpine")))%>%
   summarize(mean_percent_cover = mean(percent_cover)) %>%
-  filter(!mean_percent_cover == 0.0000) %>%
+  mutate(mean_percent_cover = replace(mean_percent_cover, mean_percent_cover == 0.0000, NA))%>% 
   na.omit()%>% 
   filter(mean_percent_cover > 0.01)
 ```
@@ -108,20 +111,19 @@ PlantFamily_Burn <- ggplot(
   scale_fill_manual(
     name = "Burn Severity",
     labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  scale_y_continuous(labels = percent)+
   theme(axis.text.x = element_text(
     color = "black",
     size = 7,
-    angle = 90,
-    vjust = .8,
-    hjust = .8
+    angle = 90
   ),
   axis.title.x = element_text(size = 11),
   axis.title.y = element_text(size = 11),
   axis.text.y = element_text(size = 8),
   legend.title = element_text(size = 9), 
-  legend.text = element_text(size =9)) + 
+  legend.text = element_text(size =9))
   # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
-  scale_y_continuous(labels = percent)
+  
 
 PlantFamily_Burn
 
@@ -146,15 +148,13 @@ PlantFamily_Forest <- ggplot(
   theme(legend.position = "bottom",
         legend.key.width = unit(1, "cm")) +
   theme_few()+
-  # scale_fill_manual(
-  #   name = "Burn Severity",
-  #   labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  scale_fill_manual(
+    name = "Forest Type",
+    labels = c("Lower Montane", "Upper Montane", "Subalpine"), values=c("#9ebc00","#ffc107","#981679"))+
   theme(axis.text.x = element_text(
     color = "black",
     size = 7,
-    angle = 90,
-    vjust = .8,
-    hjust = .8
+    angle = 90
   ),
   axis.title.x = element_text(size = 11),
   axis.title.y = element_text(size = 11),
@@ -176,10 +176,11 @@ PlantFamily_Forest
 PlantFamily_ForestFacet <- ggplot(
   families_sumstats,
   aes(x = Family,
-      y = mean_percent_cover)
+      y = mean_percent_cover, 
+      fill=forest_type)
 ) +
-  geom_boxplot() +
-  facet_wrap(~ forest_type) +
+  geom_boxplot(alpha =0.95) +
+  facet_wrap(~ forest_type, scales="free_x") +
   # ylim(0, 0.6) +
   # theme_classic() +
   labs(x = "Plant Family",
@@ -187,15 +188,14 @@ PlantFamily_ForestFacet <- ggplot(
   theme(legend.position = "bottom",
         legend.key.width = unit(1, "cm")) +
   theme_few()+
-  # scale_fill_manual(
-  #   name = "Burn Severity",
-  #   labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  scale_fill_manual(
+    name = "Forest Type",
+    labels = c("Lower Montane", "Upper Montane", "Subalpine"), values=c("#9ebc00","#ffc107","#981679"))+
   theme(axis.text.x = element_text(
     color = "black",
     size = 7,
     angle = 90,
-    vjust = .8,
-    hjust = .8
+    vjust = 0.25
   ),
   axis.title.x = element_text(size = 11),
   axis.title.y = element_text(size = 11),
