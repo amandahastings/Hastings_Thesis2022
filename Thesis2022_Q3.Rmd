@@ -441,6 +441,7 @@ ordiplot(NMDS_LowerMontane, type="t", main = "Lower Montane")
 vegan:: stressplot(NMDS_LowerMontane)
 NMDS_LowerMontane
 
+
 # plot(NMDS_LowerMontane, type = "n")
 # points(NMDS_LowerMontane, display = "sites", cex = 0.8, pch=21, col="red", bg="yellow")
 # points(NMDS_LowerMontane, display = "species", cex=0.7, col="blue")
