@@ -4,7 +4,7 @@ author: "Amanda Hastings"
 date: "2022-11-08"
 output: html_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -331,4 +331,61 @@ Lowermontane_families <- ggplot(
 
 Lowermontane_families
 ```
+
+## Plant families analyses 
+
+```{r}
+#Summarize plant family cover by burn severity and forest type 
+families_sumstats2 <- families_data %>%
+  group_by(forest_type, burn_sev_category, Family) %>%
+  mutate(forest_type = factor(
+    forest_type,
+    levels = c("Lower Montane", "Upper Montane","Subalpine")))%>%
+  summarize(mean_percent_cover = mean(percent_cover)) %>%
+  mutate(mean_percent_cover = replace(mean_percent_cover, mean_percent_cover == 0.0000, NA))%>% 
+  na.omit()
+
+hist(families_sumstats2$mean_percent_cover)
+hist(sqrt(families_sumstats2$mean_percent_cover))
+```
+
+
+```{r}
+#
+LMFamilies <- lm(sqrt(mean_percent_cover) ~ Family, data = families_sumstats2)
+anova(LMFamilies)
+par(mfrow = c(1, 2))
+plot(LMFamilies, which = 1:2)
+```
+
+
+```{r}
+emoutFamilies <- emmeans(LMFamilies, ~ Family)
+emoutFamilies
+pairs(emoutFamilies)
+cld(emoutFamilies)
+```
+
+## NMDS plant families 
+
+```{r}
+#Data frame with family counts, pivot wider
+families_NMDS <- families_data %>% 
+  dplyr::select(PlotID, forest_type, burn_sev_category, Family, Count) %>% 
+  filter(!Count ==0)%>% 
+  na.omit()%>% 
+  pivot_wider(names_from = Family, values_from = Count)
+
+families_NMDS[is.na(families_NMDS)] <- 0
+
+#standardize by hellinger method 
+families_NMDS_matrix <- families_NMDS %>% 
+  dplyr:: select(-forest_type, -burn_sev_category)%>%
+  remove_rownames %>% 
+  column_to_rownames(var="PlotID")%>% 
+  decostand(., method='hellinger')
+```
+
+
+
 
