@@ -348,9 +348,63 @@ POTRSeedPrefireBA <- ThesisAll1 %>%
 
 
 
+#------------Deciduous speices only analyses------------------------------------
 
 
+# Two way ANOVA QUGA density only, sqrt transform
+```{r}
+# Two way ANOVA deciduous, sqrt transform
+ThesisAll1$QUGA_total<-as.integer(ThesisAll1$QUGA_total)
 
+
+QUGAdensity <- ThesisAll1 %>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type, QUGA_total)%>% 
+  filter(forest_type == "Lower Montane")
+
+
+hist(sqrt(QUGAdensity$QUGA_total))
+
+QUGALMFit <- lm(sqrt(QUGA_total) ~ burn_sev_category, data = QUGAdensity)
+anova(QUGALMFit)
+par(mfrow = c(1, 2))
+plot(QUGALMFit, which = 1:2)
+```
+
+
+# Two way ANOVA POTR density only, sqrt transform
+```{r}
+# Two way ANOVA deciduous, sqrt transform
+ThesisAll1$POTR_total<-as.integer(ThesisAll1$POTR_total)
+
+hist(sqrt(ThesisAll1$POTR_total))
+
+
+POTRLMFit <- lm(sqrt(POTR_total) ~ burn_sev_category*forest_type, data = ThesisAll1)
+anova(POTRLMFit)
+par(mfrow = c(1, 2))
+plot(POTRLMFit, which = 1:2)
+```
+
+
+# One-way ANOVA RONE density only, 
+
+```{r}
+# Two way ANOVA deciduous, sqrt transform
+ThesisAll1$RONE_total<-as.integer(ThesisAll1$RONE_total)
+
+
+RONEdensity <- ThesisAll1 %>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type, RONE_total)%>% 
+  filter(forest_type == "Lower Montane")
+
+
+hist(sqrt(RONEdensity$RONE_total))
+
+RONELMFit <- lm(sqrt(RONE_total) ~ burn_sev_category, data = RONEdensity)
+anova(RONELMFit)
+par(mfrow = c(1, 2))
+plot(RONELMFit, which = 1:2)
+```
 
 
 
