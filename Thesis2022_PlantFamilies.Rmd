@@ -366,7 +366,7 @@ pairs(emoutFamilies)
 cld(emoutFamilies)
 ```
 
-## NMDS plant families 
+## NMDS data frame plant families 
 
 ```{r}
 #Data frame with family counts, pivot wider
@@ -383,9 +383,160 @@ families_NMDS_matrix <- families_NMDS %>%
   dplyr:: select(-forest_type, -burn_sev_category)%>%
   remove_rownames %>% 
   column_to_rownames(var="PlotID")%>% 
-  decostand(., method='hellinger')
+  decostand(., method='total')
+
+families.NMDS.nopred <- families_NMDS %>% 
+  dplyr:: select(-forest_type, -burn_sev_category)%>%
+  remove_rownames %>% 
+  column_to_rownames(var="PlotID")
 ```
 
+## Running NMDS
+
+```{r}
+library(ggvegan)
+NMDS_families <- metaMDS(families_NMDS_matrix, distance = "bray", autotransform = F, k=2)
+ordiplot(NMDS_families, type="t")
+autoplot(NMDS_families)
+
+```
+
+
+
+## NMDS families plot 
+
+```{r}
+#Fortified ordination - plant families
+fort_Families <- fortify(NMDS_families)
+
+#Grab burn severity and forest type from plot ID
+families_NMDS_pred <- families_NMDS %>% 
+   dplyr::select(PlotID,forest_type, burn_sev_category)%>% 
+  remove_rownames %>% 
+  column_to_rownames(var="PlotID")
+
+#Fortified data frame plus burn severity and forest type to plot
+fort.plot_Families <- merge(fort_Families, families_NMDS_pred, by.x = "Label", by.y = "PlotID", all = T)
+  
+```
+
+
+## Adding burn severity and forest type categories 
+
+```{r}
+#Lower Montane env fit 
+EnvFit_Families <- envfit(NMDS_families, families_NMDS_pred)
+# plot(EnvFit_LowerMontane)
+EnvFit_Families
+```
+
+
+```{r}
+adonis2(families.NMDS.nopred ~burn_sev_category, data = families_NMDS_pred)
+```
+
+
+
+```{r}
+# Burn severity as factor
+Families.env.scores <- as.data.frame(scores(EnvFit_Families, display = "factors"))
+
+
+Families.env.scores <- cbind(Families.env.scores, Categories = rownames(Families.env.scores))
+#    mutate("Categories2" = case_when(Categories == "forest_typeLowerMontane"  ~ "Lower Montane", 
+# #                                 EnvPred == "heat_load" ~ "Heat Load", 
+# #                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
+# #                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
+# #                                 EnvPred == "live_ba" ~ "Live Basal Area", 
+# #                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
+# #                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+# #                                 EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
+
+```
+
+
+## Families plot with ggplot 
+
+```{r}
+#Families NMDS plot
+FamiliesNMDSplot <- ggplot() +
+    geom_point(
+    data = subset(fort.plot_Families, Score == "sites"),size = 1,
+    alpha = 0.75,
+    shape = "circle",
+    stroke = 1,
+    mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+  scale_color_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  # geom_segment(
+  #   data = LowerMontane.sig.env.scoresdf,
+  #   aes(
+  #     x = 0,
+  #     xend = NMDS1,
+  #     y = 0,
+  #     yend = NMDS2),
+  #   arrow = arrow(length = unit(0.025, "npc")),
+  #   size = 0.75
+  # ) +
+  #  geom_text(
+  #   data = subset(LowerMontane.sig.env.scoresdf),
+  #   check_overlap = T,
+  #   fontface = "italic",
+  #   size = 4,
+  #   nudge_x = 0.25,
+  #   nudge_y = -0.025,
+  #   vjust = 0.0,
+  #   #Pushes label away from the arrow
+  #   mapping = aes(
+  #     label = EnvPred2,
+  #     x = NMDS1 * 1.1,
+  #     y = NMDS2 * 1.1
+  #   )
+  # ) +
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+
+  labs(title = "Plant families across sites") +
+  geom_text(
+    data = subset(fort_Families, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
+    size = 3,
+    # nudge_y = -0.025,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1,
+      y = NMDS2,
+    )
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size=10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
+
+FamiliesNMDSplot
+```
 
 
 
