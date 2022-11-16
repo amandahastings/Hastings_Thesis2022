@@ -316,7 +316,7 @@ max_NMDSdf_Subalpine <- ThesisNMDSResponse %>%
 #OVerlay predictors data frame 
 OverlayPredictors1 <- ThesisAll1 %>% 
   # dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., aspect_rescaled, heat_load, canopy_cover, avg_seed_source, conifer_seed_source, bg_cover, lt_cover, wd_cover, rk_cover, total_ba, live_ba, dead_ba)%>% 
-  dplyr::select(PlotID, burn_sev_category, forest_type, heat_load, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, CWD, conifer_seed_source, PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>%
+  dplyr::select(PlotID, burn_sev_category, forest_type, aspect_rescaled, heat_load, canopy_cover, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, CWD, conifer_seed_source, PSME_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>%
   rowwise()%>%
   mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
   mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
@@ -540,72 +540,72 @@ SignifEnvFit_Subalpine
 ## Fitting env fit vectors to plot  
 
 ```{r}
-# #Lower Montane EnvFit df for plotting
-# LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "sites"))
-# 
-# 
-# # Burn severity as factor 
-# # LowerMontane.env.scores1 <- as.data.frame(scores(EnvFit_LowerMontane, display = "factors"))
-# # LowerMontane.env.scores1 <- cbind(LowerMontane.env.scores1, EnvPred = rownames(LowerMontane.env.scores1))
-# 
-# LowerMontane.env.scoresdf <-
-#   as.data.frame(scores(EnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(EnvFit_LowerMontane)
-# 
-# LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
-# 
-# # LowerMontane.env.scoresdf <- rbind(LowerMontane.env.scoresdf, LowerMontane.env.scores1)
-# 
-# LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>% 
-#   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
-#                                 EnvPred == "heat_load" ~ "Heat Load", 
-#                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
-#                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
-#                                 EnvPred == "live_ba" ~ "Live Basal Area", 
-#                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-#                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
-#                                 EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
-#   filter(!is.na(EnvPred2))
-#          
-# #Upper Montane EnvFit df for plotting
-# UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
-# 
-# UpperMontane.env.scoresdf <-
-#   as.data.frame(scores(EnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(EnvFit_UpperMontane)
-# 
-# UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
-# 
-# UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>% 
-#   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
-#                                 EnvPred == "heat_load" ~ "Heat Load", 
-#                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
-#                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
-#                                 EnvPred == "live_ba" ~ "Live Basal Area", 
-#                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-#                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
-#                                 EnvPred == "CWD" ~ "Coarse Woody Debris"))%>% 
-#   filter(!is.na(EnvPred2))
-#   
-#          
-# 
-# 
-# #Subalpine EnvFit df for plotting
-# Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
-# 
-# Subalpine.env.scoresdf <-
-#   as.data.frame(scores(EnvFit_Subalpine, display = "vectors")) * ordiArrowMul(EnvFit_Subalpine)
-# 
-# Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
-# 
-# Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>% 
-#   mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect", 
-#                                 EnvPred == "heat_load" ~ "Heat Load", 
-#                                 EnvPred == "canopy_cover" ~ "Canopy Cover", 
-#                                 EnvPred == "conifer_seed_source" ~ "Distance to Seed Source", 
-#                                 EnvPred == "live_ba" ~ "Live Basal Area", 
-#                                 EnvPred == "organic_cover" ~ "Litter/Woody Debris", 
-#                                 EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>% 
-#   filter(!is.na(EnvPred2))
-#   
+#Lower Montane EnvFit df for plotting
+LowerMontane.sp.scoresdf <- as.data.frame(scores(NMDS_LowerMontane, display = "sites"))
+
+
+# Burn severity as factor
+# LowerMontane.env.scores1 <- as.data.frame(scores(EnvFit_LowerMontane, display = "factors"))
+# LowerMontane.env.scores1 <- cbind(LowerMontane.env.scores1, EnvPred = rownames(LowerMontane.env.scores1))
+
+LowerMontane.env.scoresdf <-
+  as.data.frame(scores(EnvFit_LowerMontane, display = "vectors")) * ordiArrowMul(EnvFit_LowerMontane)
+
+LowerMontane.env.scoresdf <- cbind(LowerMontane.env.scoresdf, EnvPred = rownames(LowerMontane.env.scoresdf))
+
+# LowerMontane.env.scoresdf <- rbind(LowerMontane.env.scoresdf, LowerMontane.env.scores1)
+
+LowerMontane.env.scoresdf <- LowerMontane.env.scoresdf%>%
+  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect",
+                                EnvPred == "heat_load" ~ "Heat Load",
+                                EnvPred == "canopy_cover" ~ "Canopy Cover",
+                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source",
+                                EnvPred == "live_ba" ~ "Live Basal Area",
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris",
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+                                EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
+  filter(!is.na(EnvPred2))
+
+#Upper Montane EnvFit df for plotting
+UpperMontane.sp.scoresdf <- as.data.frame(scores(NMDS_UpperMontane, display = "sites"))
+
+UpperMontane.env.scoresdf <-
+  as.data.frame(scores(EnvFit_UpperMontane, display = "vectors")) * ordiArrowMul(EnvFit_UpperMontane)
+
+UpperMontane.env.scoresdf <- cbind(UpperMontane.env.scoresdf, EnvPred = rownames(UpperMontane.env.scoresdf))
+
+UpperMontane.env.scoresdf <- UpperMontane.env.scoresdf%>%
+  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect",
+                                EnvPred == "heat_load" ~ "Heat Load",
+                                EnvPred == "canopy_cover" ~ "Canopy Cover",
+                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source",
+                                EnvPred == "live_ba" ~ "Live Basal Area",
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris",
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire",
+                                EnvPred == "CWD" ~ "Coarse Woody Debris"))%>%
+  filter(!is.na(EnvPred2))
+
+
+
+
+#Subalpine EnvFit df for plotting
+Subalpine.sp.scoresdf <- as.data.frame(scores(NMDS_Subalpine, display = "sites"))
+
+Subalpine.env.scoresdf <-
+  as.data.frame(scores(EnvFit_Subalpine, display = "vectors")) * ordiArrowMul(EnvFit_Subalpine)
+
+Subalpine.env.scoresdf <- cbind(Subalpine.env.scoresdf, EnvPred = rownames(Subalpine.env.scoresdf))
+
+Subalpine.env.scoresdf <- Subalpine.env.scoresdf%>%
+  mutate("EnvPred2" = case_when(EnvPred == "aspect_rescaled"  ~ "Aspect",
+                                EnvPred == "heat_load" ~ "Heat Load",
+                                EnvPred == "canopy_cover" ~ "Canopy Cover",
+                                EnvPred == "conifer_seed_source" ~ "Distance to Seed Source",
+                                EnvPred == "live_ba" ~ "Live Basal Area",
+                                EnvPred == "organic_cover" ~ "Litter/Woody Debris",
+                                EnvPred == "burn_sev_categoryHigh" ~ "High Severity Fire"))%>%
+  filter(!is.na(EnvPred2))
+
          
 ```
 
@@ -691,6 +691,91 @@ fort.plot_LowerMontane <- merge(fort_LowerMontane, LowerMontaneSeverity, by.x = 
   
 ```
 
+## All environmental predictors - not using
+
+```{r}
+#Lower Montane plot
+LowerMontaneNMDSplot2 <- ggplot() +
+    geom_point(
+    data = subset(fort.plot_LowerMontane, Score == "sites"),size = 3,
+    alpha = 0.75,
+    shape = "circle",
+    stroke = 1,
+    mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+  scale_color_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  geom_segment(
+    data = LowerMontane.env.scoresdf,
+    aes(
+      x = 0,
+      xend = NMDS1,
+      y = 0,
+      yend = NMDS2),
+    arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75
+  ) +
+   geom_text(
+    data = subset(LowerMontane.env.scoresdf),
+    check_overlap = T,
+    fontface = "italic",
+    size = 4,
+    nudge_x = 0.25,
+    nudge_y = -0.025,
+    vjust = 0.0,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = EnvPred2,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
+  ) +
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+
+  labs(title = "Lower Montane") +
+  geom_text(
+    data = subset(fort_LowerMontane, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
+    size = 3.25,
+    nudge_y = -0.025,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1,
+      y = NMDS2,
+    )
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size=10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
+
+LowerMontaneNMDSplot2
+```
+
+
+#Significant vectors only 
 
 ```{r}
 #Lower Montane plot
@@ -792,6 +877,89 @@ fort.plot_UpperMontane <- merge(fort_UpperMontane, UpperMontaneSeverity, by.x = 
   
 ```
 
+
+```{r}
+
+#Upper Montane plot
+UpperMontaneNMDSplot2 <- ggplot() +
+    geom_point(
+    data = subset(fort.plot_UpperMontane, Score == "sites"),size = 3,
+    alpha = 0.75,
+    shape = "circle",
+    stroke = 1,
+    mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+  scale_color_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  geom_segment(
+    data = UpperMontane.env.scoresdf,
+    aes(
+      x = 0,
+      xend = NMDS1,
+      y = 0,
+      yend = NMDS2),
+    arrow = arrow(length = unit(0.025, "npc")),
+    size = 0.75
+  ) +
+  geom_text(
+    data = subset(UpperMontane.env.scoresdf),
+    check_overlap = T,
+    fontface = "italic",
+    size = 4,
+    nudge_x = -0.13,
+    nudge_y = 0.015,
+    vjust = 0.5,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = EnvPred2,
+      x = NMDS1 * 1.1,
+      y = NMDS2 * 1.1
+    )
+  ) +
+  geom_abline(
+    #Horizontal line through origin
+    intercept = 0,
+    slope = 0,
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+
+  labs(title = "Upper Montane") +
+  geom_text(
+    data = subset(fort_UpperMontane, Score == 'species'),
+    check_overlap = F,
+    fontface = "bold",
+    size = 3.25,
+    nudge_y = -0.015,
+    nudge_x = -0.015,
+    #Pushes label away from the arrow
+    mapping = aes(
+      label = Label,
+      x = NMDS1,
+      y = NMDS2
+    )
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size=10),
+    legend.text = element_text(size = 9)
+  ) +
+  labs(x = "NMDS1", y = "NMDS2")
+
+UpperMontaneNMDSplot2
+```
 
 ```{r}
 

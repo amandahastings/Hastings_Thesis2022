@@ -358,16 +358,37 @@ ThesisAll1$QUGA_total<-as.integer(ThesisAll1$QUGA_total)
 
 
 QUGAdensity <- ThesisAll1 %>% 
-  dplyr::select(PlotID, burn_sev_category, forest_type, QUGA_total)%>% 
-  filter(forest_type == "Lower Montane")
+  dplyr::select(PlotID, aspect_rescaled, heat_load, field.elevation..m., burn_sev_category, forest_type, QUGA_total)%>% 
+  filter(!forest_type == "Subalpine")
 
 
 hist(sqrt(QUGAdensity$QUGA_total))
 
-QUGALMFit <- lm(sqrt(QUGA_total) ~ burn_sev_category, data = QUGAdensity)
+QUGALMFit <- lm(sqrt(QUGA_total) ~ burn_sev_category+forest_type, data = QUGAdensity)
 anova(QUGALMFit)
 par(mfrow = c(1, 2))
 plot(QUGALMFit, which = 1:2)
+
+
+QUGAPoisson <- glm(QUGA_total~ burn_sev_category+forest_type, data=QUGAdensity, family=poisson) 
+summary(QUGAPoisson )
+Anova(QUGAPoisson)
+```
+
+
+```{r}
+ggplot(QUGAdensity,
+       aes(x = heat_load, y = QUGA_total)) +
+  geom_point()
+
+cor.test(QUGAdensity$QUGA_total, QUGAdensity$heat_load)     
+```
+
+
+```{r}
+emoutQUGAPoisson <- emmeans(QUGAPoisson, ~burn_sev_category*forest_type, type= "response")
+pairs(emoutQUGAPoisson)
+cld(emoutQUGAPoisson)
 ```
 
 
@@ -385,6 +406,17 @@ par(mfrow = c(1, 2))
 plot(POTRLMFit, which = 1:2)
 ```
 
+# Test of correlation for POTR densities and heat load 
+
+```{r}
+ggplot(ThesisAll1,
+       aes(x = heat_load, y = POTR_total)) +
+  geom_point()
+
+
+cor.test(ThesisAll1$POTR_total, ThesisAll1$heat_load)
+```
+
 
 # One-way ANOVA RONE density only, 
 
@@ -394,7 +426,7 @@ ThesisAll1$RONE_total<-as.integer(ThesisAll1$RONE_total)
 
 
 RONEdensity <- ThesisAll1 %>% 
-  dplyr::select(PlotID, burn_sev_category, forest_type, RONE_total)%>% 
+  dplyr::select(PlotID, aspect_rescaled, heat_load, field.elevation..m., burn_sev_category, forest_type, RONE_total)%>% 
   filter(forest_type == "Lower Montane")
 
 
@@ -404,6 +436,8 @@ RONELMFit <- lm(sqrt(RONE_total) ~ burn_sev_category, data = RONEdensity)
 anova(RONELMFit)
 par(mfrow = c(1, 2))
 plot(RONELMFit, which = 1:2)
+
+cor.test(RONEdensity$RONE_total, RONEdensity$heat_load)
 ```
 
 
