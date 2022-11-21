@@ -442,8 +442,28 @@ cor.test(RONEdensity$RONE_total, RONEdensity$heat_load)
 
 
 
+# Correlation conifers 
+
+```{r}
+LowerMontane <- ThesisAll1 %>% 
+  filter(forest_type == "Lower Montane")
+
+cor.test(LowerMontane$conifer_total, LowerMontane$heat_load)
+```
+
+# PICO only 
+
+```{r}
+ThesisAll1$PICO_total<-as.integer(ThesisAll1$PICO_total)
+
+hist(sqrt(ThesisAll1$PICO_total))
 
 
+PICOLMFit <- lm(sqrt(PICO_total) ~ burn_sev_category*forest_type, data = ThesisAll1)
+anova(PICOLMFit)
+par(mfrow = c(1, 2))
+plot(PICOLMFit, which = 1:2)
+```
 
 
 

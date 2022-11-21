@@ -87,6 +87,10 @@ families_sumstats <- families_data %>%
   mutate(mean_percent_cover = replace(mean_percent_cover, mean_percent_cover == 0.0000, NA))%>% 
   na.omit()%>% 
   filter(mean_percent_cover > 0.01)
+
+families_means <- families_data %>% 
+  group_by(Family)%>% 
+  summarize (mean_family_allsites = mean(percent_cover))
 ```
 
 ## Plant families by burn severity  
@@ -445,7 +449,7 @@ EnvFit_Families
 
 
 ```{r}
-adonis2(families.NMDS.nopred ~burn_sev_category, data = families_NMDS_pred)
+adonis2(families.NMDS.nopred ~burn_sev_category*forest_type, data = families_NMDS_pred)
 ```
 
 
@@ -471,17 +475,22 @@ Families.env.scores <- cbind(Families.env.scores, Categories = rownames(Families
 ## Families plot with ggplot 
 
 ```{r}
+library(ggrepel)
 #Families NMDS plot
-FamiliesNMDSplot <- ggplot() +
-    geom_point(
-    data = subset(fort.plot_Families, Score == "sites"),size = 1,
+FamiliesBurnNMDSplot <- ggplot() +
+  geom_point(
+    data = subset(fort.plot_Families, Score == "sites"),
+    size = 2,
     alpha = 0.75,
     shape = "circle",
     stroke = 1,
-    mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)) +
+    mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)
+  ) +
   scale_color_manual(
-    name = "Burn Severity",
-    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+    name = "",
+    labels = c("High Severity", "Low Severity"),
+    values = c("#bd0026", "#fd8d3c")
+  ) +
   # geom_segment(
   #   data = LowerMontane.sig.env.scoresdf,
   #   aes(
@@ -493,28 +502,28 @@ FamiliesNMDSplot <- ggplot() +
   #   size = 0.75
   # ) +
   #  geom_text(
-  #   data = subset(LowerMontane.sig.env.scoresdf),
-  #   check_overlap = T,
-  #   fontface = "italic",
-  #   size = 4,
-  #   nudge_x = 0.25,
-  #   nudge_y = -0.025,
-  #   vjust = 0.0,
-  #   #Pushes label away from the arrow
-  #   mapping = aes(
-  #     label = EnvPred2,
-  #     x = NMDS1 * 1.1,
-  #     y = NMDS2 * 1.1
-  #   )
-  # ) +
-  geom_abline(
-    #Horizontal line through origin
-    intercept = 0,
-    slope = 0,
-    linetype = "dashed",
-    size = 0.5,
-    colour = "gray"
-  ) +
+#   data = subset(LowerMontane.sig.env.scoresdf),
+#   check_overlap = T,
+#   fontface = "italic",
+#   size = 4,
+#   nudge_x = 0.25,
+#   nudge_y = -0.025,
+#   vjust = 0.0,
+#   #Pushes label away from the arrow
+#   mapping = aes(
+#     label = EnvPred2,
+#     x = NMDS1 * 1.1,
+#     y = NMDS2 * 1.1
+#   )
+# ) +
+geom_abline(
+  #Horizontal line through origin
+  intercept = 0,
+  slope = 0,
+  linetype = "dashed",
+  size = 0.5,
+  colour = "gray"
+) +
   geom_vline(
     #Vertical line through origin
     aes(xintercept = 0),
@@ -522,21 +531,19 @@ FamiliesNMDSplot <- ggplot() +
     size = 0.5,
     colour = "gray"
   ) +
-
-  labs(title = "Plant families across sites") +
-  geom_text(
+  
+  # labs(title = "") +
+  geom_text_repel(
     data = subset(fort_Families, Score == 'species'),
-    check_overlap = F,
+    # check_overlap = F,
     fontface = "bold",
     size = 3,
-    color="#51484f",
+    color = "#51484f",
     # nudge_y = -0.025,
     #Pushes label away from the arrow
-    mapping = aes(
-      label = Label,
-      x = NMDS1,
-      y = NMDS2,
-    )
+    mapping = aes(label = Label,
+                  x = NMDS1,
+                  y = NMDS2,)
   ) +
   theme_few() +
   theme(
@@ -544,15 +551,120 @@ FamiliesNMDSplot <- ggplot() +
     axis.title.x = element_text(size = 11),
     axis.title.y = element_text(size = 11),
     axis.text.y = element_text(size = 8),
-    legend.title = element_text(size=10),
-    legend.text = element_text(size = 8)
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "bottom",
+    legend.key.width = unit(1, "cm")
   ) +
   labs(x = "NMDS1", y = "NMDS2")
-  # xlim (-1.5,1.5)+ 
-  # ylim(-1.5,1.5)
+# xlim (-1.5,1.5)+
+# ylim(-1.5,1.5)
 
-FamiliesNMDSplot
+FamiliesBurnNMDSplot
 ```
 
 
+
+```{r}
+#Families NMDS plot
+FamiliesForestNMDSplot <- ggplot() +
+  geom_point(
+    data = subset(fort.plot_Families, Score == "sites"),
+    size = 2,
+    alpha = 0.75,
+    shape = "circle",
+    stroke = 1,
+    mapping = aes(x = NMDS1, y = NMDS2, color = forest_type)
+  ) +
+  scale_color_manual(
+    name = "",
+    labels = c("Lower Montane", "Upper Montane", "Subalpine"),
+    values = c("#9ebc00", "#ffc107", "#981679")
+  ) +
+  # geom_segment(
+  #   data = LowerMontane.sig.env.scoresdf,
+  #   aes(
+  #     x = 0,
+  #     xend = NMDS1,
+  #     y = 0,
+  #     yend = NMDS2),
+  #   arrow = arrow(length = unit(0.025, "npc")),
+  #   size = 0.75
+  # ) +
+  #  geom_text(
+#   data = subset(LowerMontane.sig.env.scoresdf),
+#   check_overlap = T,
+#   fontface = "italic",
+#   size = 4,
+#   nudge_x = 0.25,
+#   nudge_y = -0.025,
+#   vjust = 0.0,
+#   #Pushes label away from the arrow
+#   mapping = aes(
+#     label = EnvPred2,
+#     x = NMDS1 * 1.1,
+#     y = NMDS2 * 1.1
+#   )
+# ) +
+geom_abline(
+  #Horizontal line through origin
+  intercept = 0,
+  slope = 0,
+  linetype = "dashed",
+  size = 0.5,
+  colour = "gray"
+) +
+  geom_vline(
+    #Vertical line through origin
+    aes(xintercept = 0),
+    linetype = "dashed",
+    size = 0.5,
+    colour = "gray"
+  ) +
+  geom_text_repel(
+    data = subset(fort_Families, Score == 'species'),
+    # check_overlap = F,
+    fontface = "bold",
+    size = 3,
+    color = "#51484f",
+    # nudge_y = 0,
+    # vjust = 1,
+    #Pushes label away from the arrow
+    mapping = aes(label = Label,
+                  x = NMDS1,
+                  y = NMDS2,)
+  ) +
+  theme_few() +
+  theme(
+    axis.text.x = element_text(size = 9),
+    axis.title.x = element_text(size = 11),
+    axis.title.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "bottom",
+  ) +
+  labs(x = "NMS1", y = "NMS2")
+# xlim (-1.5,1.5)+
+# ylim(-1.5,1.5)
+
+FamiliesForestNMDSplot
+
+```
+
+
+```{r}
+
+#Place plots side by side 
+
+legend1 <- get_legend(FamiliesBurnNMDSplot)
+legend2 <- get_legend(FamiliesForestNMDSplot)
+
+legends = list(legend1, legend2)
+
+
+ggarrange(FamiliesBurnNMDSplot, FamiliesForestNMDSplot)
+  
+# annotate_figure(Families_ggarrange, fig.lab = "NMDS1", fig.lab.pos = "bottom")
+```
 
