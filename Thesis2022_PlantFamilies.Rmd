@@ -449,9 +449,13 @@ EnvFit_Families
 
 
 ```{r}
-adonis2(families.NMDS.nopred ~burn_sev_category*forest_type, data = families_NMDS_pred)
+adonis2(families.NMDS.nopred ~burn_sev_category*forest_type, data = families_NMDS_pred, distance ="bray")
 ```
 
+
+```{r}
+# mrpp(families.NMDS.nopred)
+```
 
 
 ```{r}
@@ -556,7 +560,7 @@ geom_abline(
     legend.position = "bottom",
     legend.key.width = unit(1, "cm")
   ) +
-  labs(x = "NMDS1", y = "NMDS2")
+  labs(x = "NMS1", y = "NMS2")
 # xlim (-1.5,1.5)+
 # ylim(-1.5,1.5)
 
