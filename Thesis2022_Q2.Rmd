@@ -100,11 +100,12 @@ PlantCoverPlot <- ggplot(
     vjust = .8,
     hjust = .8
   ),
-  axis.title.x = element_text(size = 11),
-  axis.title.y = element_text(size = 11),
-  axis.text.y = element_text(size = 8),
-  legend.title = element_text(size = 9), 
-  legend.text = element_text(size =9)) + 
+  axis.title.x = element_text(size = 12),
+  axis.title.y = element_text(size = 12),
+  axis.text.y = element_text(size = 10),
+  legend.title = element_text(size = 12),
+  strip.text.x = element_text(size=12),
+  legend.text = element_text(size =11)) + 
   scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
   scale_y_continuous(labels = percent)
 

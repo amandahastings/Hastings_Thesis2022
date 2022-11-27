@@ -137,7 +137,8 @@ ggplot(SeedlingsLong2,
     axis.title.y=element_text(size=12), 
     axis.text.y = element_text(size=10), 
     legend.title=element_text(size=12), 
-    strip.text.x = element_text(size=12))
+    strip.text.x = element_text(size=12), 
+    legend.text = element_text(size=11))
 ```
 
 # Data frame analyses grouped by conifer/decid 
