@@ -541,7 +541,7 @@ geom_abline(
     data = subset(fort_Families, Score == 'species'),
     # check_overlap = F,
     fontface = "bold",
-    size = 3,
+    size = 3.5,
     color = "#51484f",
     # nudge_y = -0.025,
     #Pushes label away from the arrow
@@ -551,12 +551,12 @@ geom_abline(
   ) +
   theme_few() +
   theme(
-    axis.text.x = element_text(size = 9),
-    axis.title.x = element_text(size = 11),
-    axis.title.y = element_text(size = 11),
-    axis.text.y = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
+    axis.text.x = element_text(size = 10),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11),
     legend.position = "bottom",
     legend.key.width = unit(1, "cm")
   ) +
@@ -629,7 +629,7 @@ geom_abline(
     data = subset(fort_Families, Score == 'species'),
     # check_overlap = F,
     fontface = "bold",
-    size = 3,
+    size = 3.5,
     color = "#51484f",
     # nudge_y = 0,
     # vjust = 1,
@@ -640,12 +640,12 @@ geom_abline(
   ) +
   theme_few() +
   theme(
-    axis.text.x = element_text(size = 9),
-    axis.title.x = element_text(size = 11),
-    axis.title.y = element_text(size = 11),
-    axis.text.y = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
+    axis.text.x = element_text(size = 10),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11),
     legend.position = "bottom",
   ) +
   labs(x = "NMS1", y = "NMS2")
