@@ -156,6 +156,64 @@ ThesisAll1 <- ThesisAll1 %>%
   mutate("conifer_total" = rowSums(ThesisAll1[,conifer_list]))
 ```
 
+# Conifer and deciduous data frame for plotting 
+
+```{r}
+
+DecidConiferLong <- ThesisAll1 %>%
+  rename("Coniferous"= conifer_total)%>%
+  rename("Deciduous"= deciduous_total)%>%
+  dplyr::select(forest_type,
+                burn_sev_category,
+                Coniferous,
+                Deciduous) %>%
+  pivot_longer(
+    cols = c("Coniferous", "Deciduous"),
+    names_to = "TreeGroup",
+    values_to = "Density"
+  ) %>%
+  mutate(forest_type = factor(
+    forest_type,
+    levels = c("Lower Montane", "Upper Montane", "Subalpine")
+  ))
+```
+
+
+
+# Conifer and deciduous plot 
+
+```{r}
+ggplot(DecidConiferLong,
+       aes(x = TreeGroup, y = Density, fill = burn_sev_category)) +
+  geom_boxplot() + 
+  # ylim(0, 25000) +
+  facet_wrap(~ forest_type, scales="free_x") +
+  labs(x = "Etymological Group",
+       y = "Seedlings per hectare",
+       fill = "Burn Severity") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(1, "cm")) +
+  theme_few() +
+  scale_fill_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  theme(
+    axis.text.x = element_text(
+      color = "black",
+      size = 10,
+      angle = 0,
+      vjust = 1.5,
+      hjust = .5
+    ), 
+    axis.title.x=element_text(size=12), 
+    axis.title.y=element_text(size=12), 
+    axis.text.y = element_text(size=10), 
+    legend.title=element_text(size=12), 
+    strip.text.x = element_text(size=12), 
+    legend.text = element_text(size=11))
+```
+
+
 
 # Summary statistics of conifer/decid seedlings densities across sites
 

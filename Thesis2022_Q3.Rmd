@@ -846,12 +846,12 @@ LowerMontaneNMDSplot <- ggplot() +
   ) +
   theme_few() +
   theme(
-    axis.text.x = element_text(size = 9),
-    axis.title.x = element_text(size = 11),
-    axis.title.y = element_text(size = 11),
-    axis.text.y = element_text(size = 8),
-    legend.title = element_text(size=10),
-    legend.text = element_text(size = 8)
+    axis.text.x = element_text(size = 10),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    legend.title = element_text(size=12),
+    legend.text = element_text(size = 11)
   ) +
   labs(x = "NMS1", y = "NMS2")
 
@@ -1033,12 +1033,12 @@ UpperMontaneNMDSplot <- ggplot() +
   ) +
   theme_few() +
   theme(
-    axis.text.x = element_text(size = 9),
-    axis.title.x = element_text(size = 11),
-    axis.title.y = element_text(size = 11),
-    axis.text.y = element_text(size = 8),
-    legend.title = element_text(size=10),
-    legend.text = element_text(size = 9)
+    axis.text.x = element_text(size = 10),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    legend.title = element_text(size=12),
+    legend.text = element_text(size = 11)
   ) +
   labs(x = "NMS1", y = "NMS2")
 
@@ -1130,12 +1130,12 @@ SubalpineNMDSplot <- ggplot() +
   ) +
   theme_few() +
   theme(
-    axis.text.x = element_text(size = 9),
-    axis.title.x = element_text(size = 11),
-    axis.title.y = element_text(size = 11),
-    axis.text.y = element_text(size = 8),
-    legend.title = element_text(size=10),
-    legend.text = element_text(size = 8)
+    axis.text.x = element_text(size = 10),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    legend.title = element_text(size=12),
+    legend.text = element_text(size = 11)
   ) +
   labs(x = "NMS1", y = "NMS2")
 
