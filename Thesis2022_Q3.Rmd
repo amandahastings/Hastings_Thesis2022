@@ -834,8 +834,8 @@ LowerMontaneNMDSplot <- ggplot() +
   geom_text(
     data = subset(fort_LowerMontane, Score == 'species'),
     check_overlap = F,
-    fontface = "bold",
-    size = 3.25,
+    fontface = "bold.italic",
+    size = 3.5,
     nudge_y = -0.025,
     #Pushes label away from the arrow
     mapping = aes(
@@ -1020,8 +1020,8 @@ UpperMontaneNMDSplot <- ggplot() +
   geom_text(
     data = subset(fort_UpperMontane, Score == 'species'),
     check_overlap = F,
-    fontface = "bold",
-    size = 3.25,
+    fontface = "bold.italic",
+    size = 3.5,
     nudge_y = -0.015,
     nudge_x = -0.015,
     #Pushes label away from the arrow
@@ -1118,8 +1118,8 @@ SubalpineNMDSplot <- ggplot() +
   geom_text(
     data = subset(fort_Subalpine, Score == 'species'),
     check_overlap = F,
-    fontface = "bold",
-    size = 3.25,
+    fontface = "bold.italic",
+    size = 3.5,
     nudge_x = -0.005,
     #Pushes label away from the arrow
     mapping = aes(

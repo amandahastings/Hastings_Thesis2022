@@ -177,6 +177,8 @@ PlantFamily_Forest
 
 ```{r}
 #Plant family plot by forest type facet 
+# windowsFonts(G=windowsFont("Garamond"))
+
 PlantFamily_ForestFacet <- ggplot(
   families_sumstats,
   aes(x = Family,
@@ -189,24 +191,26 @@ PlantFamily_ForestFacet <- ggplot(
   # theme_classic() +
   labs(x = "Plant Family",
        y = "Percent Cover") +
-  theme(legend.position = "bottom",
-        legend.key.width = unit(1, "cm")) +
+  # theme(legend.position = "bottom",
+  #       legend.key.width = unit(1, "cm")) +
   theme_few()+
   scale_fill_manual(
     name = "Forest Type",
     labels = c("Lower Montane", "Upper Montane", "Subalpine"), values=c("#9ebc00","#ffc107","#981679"))+
   theme(axis.text.x = element_text(
     color = "black",
-    size = 7,
+    size = 10,
     angle = 90,
     vjust = 0.25
   ),
-  axis.title.x = element_text(size = 11),
-  axis.title.y = element_text(size = 11),
-  axis.text.y = element_text(size = 8),
-  legend.title = element_text(size = 9), 
-  legend.text = element_text(size =9)) + 
-  # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
+  axis.title.x = element_text(size = 12),
+  axis.title.y = element_text(size = 12),
+  axis.text.y = element_text(size = 10),
+  strip.text.x = element_text(size=12),
+  legend.position="none",
+  # legend.title = element_text(size = 9), 
+  legend.text = element_text(size =9))
+  # text=element_text(family="G")) + 
   scale_y_continuous(labels = percent)
 
 PlantFamily_ForestFacet
@@ -231,7 +235,7 @@ families_subalpine <- families_sumstats %>%
 
 
 ```{r}
-#Plant family plot by forest type facet 
+#Plant family plot - Subalpine
 Subalpine_families <- ggplot(
   families_subalpine,
   aes(x = Family,
@@ -267,7 +271,7 @@ Subalpine_families
 
 
 ```{r}
-#Plant family plot by forest type facet 
+#Plant family plot - Upper Montane
 Uppermontane_families <- ggplot(
   families_uppermontane,
   aes(x = Family,
@@ -303,7 +307,7 @@ Uppermontane_families
 
 
 ```{r}
-#Plant family plot by forest type facet 
+#Plant family plot - Lower Montane
 Lowermontane_families <- ggplot(
   families_lowermontane,
   aes(x = Family,
@@ -325,10 +329,11 @@ Lowermontane_families <- ggplot(
     vjust = .8,
     hjust = .8
   ),
-  axis.title.x = element_text(size = 11),
-  axis.title.y = element_text(size = 11),
-  axis.text.y = element_text(size = 8),
-  legend.title = element_text(size = 9), 
+  axis.title.x = element_text(size = 12),
+  axis.title.y = element_text(size = 12),
+  axis.text.y = element_text(size = 10),
+  legend.title = element_text(size = 12),
+  strip.text.x = element_text(size=12),
   legend.text = element_text(size =9)) + 
   # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
   scale_y_continuous(labels = percent)
@@ -480,12 +485,14 @@ Families.env.scores <- cbind(Families.env.scores, Categories = rownames(Families
 
 ```{r}
 library(ggrepel)
+# windowsFonts(G=windowsFont("Georgia"))
+
 #Families NMDS plot
 FamiliesBurnNMDSplot <- ggplot() +
   geom_point(
     data = subset(fort.plot_Families, Score == "sites"),
-    size = 2,
-    alpha = 0.75,
+    size = 2.5,
+    alpha = 0.5,
     shape = "circle",
     stroke = 1,
     mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)
@@ -540,9 +547,10 @@ geom_abline(
   geom_text_repel(
     data = subset(fort_Families, Score == 'species'),
     # check_overlap = F,
-    fontface = "bold",
-    size = 3.5,
+    fontface = "bold.italic",
+    size = 3,
     color = "#51484f",
+    # family = "G",
     # nudge_y = -0.025,
     #Pushes label away from the arrow
     mapping = aes(label = Label,
@@ -556,7 +564,8 @@ geom_abline(
     axis.title.y = element_text(size = 12),
     axis.text.y = element_text(size = 10),
     legend.title = element_text(size = 12),
-    legend.text = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    # text=element_text(family="G"),
     legend.position = "bottom",
     legend.key.width = unit(1, "cm")
   ) +
@@ -574,8 +583,8 @@ FamiliesBurnNMDSplot
 FamiliesForestNMDSplot <- ggplot() +
   geom_point(
     data = subset(fort.plot_Families, Score == "sites"),
-    size = 2,
-    alpha = 0.75,
+    size = 2.5,
+    alpha = 0.5,
     shape = "circle",
     stroke = 1,
     mapping = aes(x = NMDS1, y = NMDS2, color = forest_type)
@@ -628,9 +637,10 @@ geom_abline(
   geom_text_repel(
     data = subset(fort_Families, Score == 'species'),
     # check_overlap = F,
-    fontface = "bold",
-    size = 3.5,
+    fontface = "bold.italic",
+    size = 3,
     color = "#51484f",
+    # family="G",
     # nudge_y = 0,
     # vjust = 1,
     #Pushes label away from the arrow
@@ -645,8 +655,9 @@ geom_abline(
     axis.title.y = element_text(size = 12),
     axis.text.y = element_text(size = 10),
     legend.title = element_text(size = 12),
-    legend.text = element_text(size = 11),
+    legend.text = element_text(size = 10),
     legend.position = "bottom",
+    # text=element_text(family="G"),
   ) +
   labs(x = "NMS1", y = "NMS2")
 # xlim (-1.5,1.5)+
@@ -657,7 +668,7 @@ FamiliesForestNMDSplot
 ```
 
 
-```{r}
+```{r, fig.height=4, fig.width=6}
 
 #Place plots side by side 
 
