@@ -98,6 +98,11 @@ SeedlingsLong <- ThesisNAs %>%
 ```{r}
 #Omit na values
 SeedlingsLong2 <- SeedlingsLong %>% 
+  mutate(Density = replace(Density, forest_type == "Subalpine" & Species == "PIEN", NA))%>% 
+  mutate(Density = replace(Density, forest_type == "Subalpine" & Species == "ABLA", NA)) %>% 
+  mutate(Density = replace(Density, forest_type == "Subalpine" & Species == "ABCO", NA)) %>%
+  mutate(Density = replace(Density, forest_type == "Upper Montane" & Species == "ABCO", NA))%>% 
+  mutate(Density = replace(Density, forest_type == "Lower Montane" & Species == "PIPO", NA)) %>%
   na.omit
 ```
 
@@ -123,15 +128,16 @@ ggplot(SeedlingsLong2,
   theme(
     axis.text.x = element_text(
       color = "black",
-      size = 6,
+      size = 9,
       angle = 45,
       vjust = .8,
       hjust = .8
     ), 
-    axis.title.x=element_text(size=11), 
-    axis.title.y=element_text(size=11), 
-    axis.text.y = element_text(size=8), 
-    legend.title=element_text(size=9))
+    axis.title.x=element_text(size=12), 
+    axis.title.y=element_text(size=12), 
+    axis.text.y = element_text(size=10), 
+    legend.title=element_text(size=12), 
+    strip.text.x = element_text(size=12))
 ```
 
 # Data frame analyses grouped by conifer/decid 
