@@ -769,7 +769,7 @@ LowerMontaneNMDSplot2 <- ggplot() +
     legend.title = element_text(size=10),
     legend.text = element_text(size = 8)
   ) +
-  labs(x = "NMDS1", y = "NMDS2")
+  labs(x = "NMS1", y = "NMS2")
 
 LowerMontaneNMDSplot2
 ```
@@ -853,7 +853,7 @@ LowerMontaneNMDSplot <- ggplot() +
     legend.title = element_text(size=10),
     legend.text = element_text(size = 8)
   ) +
-  labs(x = "NMDS1", y = "NMDS2")
+  labs(x = "NMS1", y = "NMS2")
 
 LowerMontaneNMDSplot
 ```
@@ -956,10 +956,11 @@ UpperMontaneNMDSplot2 <- ggplot() +
     legend.title = element_text(size=10),
     legend.text = element_text(size = 9)
   ) +
-  labs(x = "NMDS1", y = "NMDS2")
+  labs(x = "NMS1", y = "NMS2")
 
 UpperMontaneNMDSplot2
 ```
+
 
 ```{r}
 
@@ -1039,7 +1040,7 @@ UpperMontaneNMDSplot <- ggplot() +
     legend.title = element_text(size=10),
     legend.text = element_text(size = 9)
   ) +
-  labs(x = "NMDS1", y = "NMDS2")
+  labs(x = "NMS1", y = "NMS2")
 
 UpperMontaneNMDSplot
 ```
@@ -1136,7 +1137,7 @@ SubalpineNMDSplot <- ggplot() +
     legend.title = element_text(size=10),
     legend.text = element_text(size = 8)
   ) +
-  labs(x = "NMDS1", y = "NMDS2")
+  labs(x = "NMS1", y = "NMS2")
 
 SubalpineNMDSplot
 ```
