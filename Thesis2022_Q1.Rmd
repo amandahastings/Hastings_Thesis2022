@@ -200,7 +200,7 @@ ggplot(DecidConiferLong,
   theme(
     axis.text.x = element_text(
       color = "black",
-      size = 10,
+      size = 9,
       angle = 0,
       vjust = 1.5,
       hjust = .5
@@ -225,6 +225,15 @@ ConiferDecidSumStats <- ThesisAll1 %>%
             conifer_sd = sd(conifer_total), 
             deciduous_mean = mean(deciduous_total), 
             deciduous_sd = sd(deciduous_total)) 
+
+#Sumstats grouped by forest type only
+ForestOnly_ConiferDecidSumStats <- ThesisAll1 %>% 
+  group_by(forest_type)%>%
+  summarize(conifer_mean = mean(conifer_total), 
+            conifer_sd = sd(conifer_total), 
+            deciduous_mean = mean(deciduous_total), 
+            deciduous_sd = sd(deciduous_total))
+
 
 length(which(ThesisAll1$conifer_total != 0.0000 & ThesisAll1$burn_sev_category == "Low"))
 length(which(ThesisAll1$conifer_total != 0.0000 & ThesisAll1$burn_sev_category == "High"))
@@ -274,6 +283,8 @@ backDecid
 # Conifer Poisson Regression
 ```{r}
 ThesisAll1$conifer_total<-as.integer(ThesisAll1$conifer_total)
+mean(ThesisAll1$conifer_total)
+sd(ThesisAll1$conifer_total)
 
 ConiferPoisson <- glm(conifer_total~ burn_sev_category*forest_type, data=ThesisAll1, family=poisson) 
 summary(ConiferPoisson)
@@ -285,6 +296,29 @@ Anova(ConiferPoisson)
 emoutConifer <- emmeans(ConiferPoisson, ~burn_sev_category*forest_type, type= "response")
 pairs(emoutConifer)
 cld(emoutConifer)
+```
+
+
+```{r}
+library(pscl)
+
+ConiferZeroInfl <- zeroinfl(conifer_total~burn_sev_category*forest_type, data=ThesisAll1)
+summary(ConiferZeroInfl)
+```
+
+
+```{r}
+library(MASS)
+ConiferNB <- glm.nb(conifer_total ~ burn_sev_category*forest_type, data=ThesisAll1, control = glm.control(maxit = 500))
+summary(ConiferNB)
+car::Anova(ConiferNB)
+```
+
+# Zero-inflated negative binomial regression 
+
+```{r}
+ConiferZeroNM <- zeroinfl(conifer_total ~ burn_sev_category*forest_type, data=ThesisAll1, dist = "negbin")
+summary(ConiferZeroNM)
 ```
 
 
@@ -458,6 +492,8 @@ cld(emoutQUGAPoisson)
 
 
 # Two way ANOVA POTR density only, sqrt transform
+
+
 ```{r}
 # Two way ANOVA deciduous, sqrt transform
 ThesisAll1$POTR_total<-as.integer(ThesisAll1$POTR_total)
@@ -470,6 +506,33 @@ anova(POTRLMFit)
 par(mfrow = c(1, 2))
 plot(POTRLMFit, which = 1:2)
 ```
+
+```{r}
+LowerMontanePOTR <- ThesisAll1 %>%
+  filter(forest_type == "Lower Montane")
+
+POTRLowerMontaneFit <- lm(sqrt(POTR_total)~ burn_sev_category, data=LowerMontanePOTR)
+anova(POTRLowerMontaneFit)
+par(mfrow = c(1, 2))
+plot(POTRLowerMontaneFit, which = 1:2)
+
+UpperMontanePOTR <- ThesisAll1 %>%
+  filter(forest_type == "Upper Montane")
+
+POTRUpperMontaneFit <- lm(sqrt(POTR_total)~ burn_sev_category, data=UpperMontanePOTR)
+anova(POTRUpperMontaneFit)
+par(mfrow = c(1, 2))
+plot(POTRUpperMontaneFit, which = 1:2)
+  
+  
+SubalpinePOTR <- ThesisAll1 %>%
+  filter(forest_type == "Subalpine")
+POTRSubalpineFit <- lm(sqrt(POTR_total)~ burn_sev_category, data=SubalpinePOTR)
+anova(POTRSubalpineFit)
+par(mfrow = c(1, 2))
+plot(POTRSubalpineFit, which = 1:2)
+```
+
 
 # Test of correlation for POTR densities and heat load 
 
