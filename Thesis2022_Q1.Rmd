@@ -298,6 +298,7 @@ pairs(emoutConifer)
 cld(emoutConifer)
 ```
 
+# Conifer zero-inflated poisson regression
 
 ```{r}
 library(pscl)
@@ -306,6 +307,7 @@ ConiferZeroInfl <- zeroinfl(conifer_total~burn_sev_category*forest_type, data=Th
 summary(ConiferZeroInfl)
 ```
 
+# Conifer negative binomial regression
 
 ```{r}
 library(MASS)
@@ -506,6 +508,7 @@ anova(POTRLMFit)
 par(mfrow = c(1, 2))
 plot(POTRLMFit, which = 1:2)
 ```
+
 
 ```{r}
 LowerMontanePOTR <- ThesisAll1 %>%
