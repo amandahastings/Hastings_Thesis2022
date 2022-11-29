@@ -85,8 +85,9 @@ families_sumstats <- families_data %>%
     levels = c("Lower Montane", "Upper Montane","Subalpine")))%>%
   summarize(mean_percent_cover = mean(percent_cover)) %>%
   mutate(mean_percent_cover = replace(mean_percent_cover, mean_percent_cover == 0.0000, NA))%>% 
-  na.omit()%>% 
+  na.omit() %>%
   filter(mean_percent_cover > 0.01)
+
 
 families_means <- families_data %>% 
   group_by(Family)%>% 
@@ -221,16 +222,31 @@ PlantFamily_ForestFacet
 
 ```{r}
 
+families_sumstats_all <- families_data %>%
+  group_by(forest_type, Family) %>%
+  mutate(forest_type = factor(
+    forest_type,
+    levels = c("Lower Montane", "Upper Montane","Subalpine")))%>%
+  summarize(mean_percent_cover = mean(percent_cover)) %>%
+  mutate(mean_percent_cover = replace(mean_percent_cover, mean_percent_cover == 0.0000, NA))%>% 
+  na.omit()
+
 families_lowermontane <- families_sumstats %>% 
   filter(forest_type == "Lower Montane")
 
+n_distinct(families_lowermontane$Family)
 
 families_uppermontane <- families_sumstats %>% 
   filter(forest_type == "Upper Montane")
 
+n_distinct(families_uppermontane$Family)
+
 
 families_subalpine <- families_sumstats %>% 
   filter(forest_type == "Subalpine")
+
+n_distinct(families_subalpine$Family)
+
 ```
 
 

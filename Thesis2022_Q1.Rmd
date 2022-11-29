@@ -316,6 +316,14 @@ summary(ConiferNB)
 car::Anova(ConiferNB)
 ```
 
+
+```{r}
+emoutConiferNB <- emmeans(ConiferNB, ~burn_sev_category*forest_type, type= "response")
+pairs(emoutConiferNB)
+cld(emoutConiferNB)
+```
+
+
 # Zero-inflated negative binomial regression 
 
 ```{r}
