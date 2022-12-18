@@ -210,7 +210,7 @@ PlantFamily_ForestFacet <- ggplot(
   strip.text.x = element_text(size=12),
   legend.position="none",
   # legend.title = element_text(size = 9), 
-  legend.text = element_text(size =9))
+  legend.text = element_text(size =9))+
   # text=element_text(family="G")) + 
   scale_y_continuous(labels = percent)
 
@@ -231,18 +231,18 @@ families_sumstats_all <- families_data %>%
   mutate(mean_percent_cover = replace(mean_percent_cover, mean_percent_cover == 0.0000, NA))%>% 
   na.omit()
 
-families_lowermontane <- families_sumstats %>% 
+families_lowermontane <- families_sumstats_all %>% 
   filter(forest_type == "Lower Montane")
 
 n_distinct(families_lowermontane$Family)
 
-families_uppermontane <- families_sumstats %>% 
+families_uppermontane <- families_sumstats_all %>% 
   filter(forest_type == "Upper Montane")
 
 n_distinct(families_uppermontane$Family)
 
 
-families_subalpine <- families_sumstats %>% 
+families_subalpine <- families_sumstats_all %>% 
   filter(forest_type == "Subalpine")
 
 n_distinct(families_subalpine$Family)
@@ -429,6 +429,8 @@ families_NMDS_pred <- families_NMDS %>%
 library(ggvegan)
 NMDS_families <- metaMDS(families_NMDS_matrix, distance = "bray", autotransform = F, k=2)
 ordiplot(NMDS_families, type="t")
+vegan:: stressplot(NMDS_families)
+NMDS_families
 
 
 autoplot(NMDS_families)
@@ -508,10 +510,10 @@ FamiliesBurnNMDSplot <- ggplot() +
   geom_point(
     data = subset(fort.plot_Families, Score == "sites"),
     size = 2.5,
-    alpha = 0.5,
-    shape = "circle",
+    alpha = 0.75,
+    # shape = "circle",
     stroke = 1,
-    mapping = aes(x = NMDS1, y = NMDS2, color = burn_sev_category)
+    mapping = aes(x = NMDS1, y = NMDS2, color=burn_sev_category)
   ) +
   scale_color_manual(
     name = "",
@@ -564,7 +566,7 @@ geom_abline(
     data = subset(fort_Families, Score == 'species'),
     # check_overlap = F,
     fontface = "bold.italic",
-    size = 3,
+    size = 3.25,
     color = "#51484f",
     # family = "G",
     # nudge_y = -0.025,
@@ -600,7 +602,7 @@ FamiliesForestNMDSplot <- ggplot() +
   geom_point(
     data = subset(fort.plot_Families, Score == "sites"),
     size = 2.5,
-    alpha = 0.5,
+    alpha = 0.75,
     shape = "circle",
     stroke = 1,
     mapping = aes(x = NMDS1, y = NMDS2, color = forest_type)
@@ -654,7 +656,7 @@ geom_abline(
     data = subset(fort_Families, Score == 'species'),
     # check_overlap = F,
     fontface = "bold.italic",
-    size = 3,
+    size = 3.25,
     color = "#51484f",
     # family="G",
     # nudge_y = 0,

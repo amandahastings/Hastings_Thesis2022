@@ -59,19 +59,24 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 ```{r}
 # Facet wrap plant cover data
 PlantCoverLong <- ThesisAll1 %>%
-  dplyr::select(PlotID, forest_type, burn_sev_category, gm_cover:tr_cover) %>%
-  tidyr::pivot_longer(gm_cover:tr_cover,
+  dplyr::select(PlotID, forest_type, burn_sev_category, gm_cover:tr_cover)%>%
+  rename(
+    "Graminoids" = gm_cover,
+    "Forbs" = fb_cover,
+    "Shrubs" = sh_cover, 
+    "Seedlings" = tr_cover)%>%
+  tidyr::pivot_longer(Graminoids:Seedlings,
     names_to = "FunctionalGroup",
     values_to = "PercentPlantCover"
   ) %>%
   mutate(FunctionalGroup = factor(
-    FunctionalGroup)) %>%
+    FunctionalGroup, levels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))) %>%
   mutate(forest_type = factor(
     forest_type,
     levels = c("Lower Montane", "Upper Montane","Subalpine")))
 ```
 
-# Plant cover plot
+# Plant cover plot - facet wrap by forest type 
 
 ```{r}
 # Facet wrap by forest type - plant cover plot
@@ -106,12 +111,56 @@ PlantCoverPlot <- ggplot(
   legend.title = element_text(size = 12),
   strip.text.x = element_text(size=12),
   legend.text = element_text(size =11)) + 
-  scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
+  # scale_x_discrete(labels = c("Forbs", "Graminoids", "Shrubs", "Seedlings"))+
   scale_y_continuous(labels = percent)
 
 PlantCoverPlot 
 
 ```
+
+
+# Plant cover plot - facet wrap by functional group
+
+```{r}
+# Facet wrap by forest type - plant cover plot
+PlantCoverPlot1 <- ggplot(
+  PlantCoverLong,
+  aes(x = forest_type,
+      y = PercentPlantCover,
+      fill = burn_sev_category)
+) +
+  geom_boxplot() + 
+  # ylim(0, 0.6) +
+  facet_wrap(~ FunctionalGroup, ncol = 4) +
+  labs(x = "Forest Type",
+       y = "Percent Cover",
+       fill = "Burn Severity") +
+  theme(legend.position = "bottom",
+        legend.key.width = unit(0.25, "cm")) +
+  theme_few()+
+  scale_fill_manual(
+    name = "Burn Severity",
+    labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
+  theme(axis.text.x = element_text(
+    color = "black",
+    size = 7,
+    angle = 90,
+    vjust = 0.25, 
+    hjust = 1,
+  ),
+  axis.title.x = element_text(size = 12),
+  axis.title.y = element_text(size = 12),
+  axis.text.y = element_text(size = 10),
+  legend.title = element_text(size = 12),
+  strip.text.x = element_text(size=12),
+  legend.text = element_text(size =11)) +
+  scale_y_continuous(labels = percent)
+
+PlantCoverPlot1 
+
+```
+
+
 
 #-----------------------Two-way ANOVA cover analyses----------------------------
 

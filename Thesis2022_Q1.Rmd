@@ -288,7 +288,7 @@ sd(ThesisAll1$conifer_total)
 
 ConiferPoisson <- glm(conifer_total~ burn_sev_category*forest_type, data=ThesisAll1, family=poisson) 
 summary(ConiferPoisson)
-Anova(ConiferPoisson)
+Anova(ConiferPoisson, type = 3)
 ```
 
 
@@ -298,6 +298,16 @@ pairs(emoutConifer)
 cld(emoutConifer)
 ```
 
+
+```{r}
+#Another way to do emmeans 
+#limits number of tests
+
+
+# emmeans(Model,pairwise~factor1|factor2)
+
+```
+
 # Conifer zero-inflated poisson regression
 
 ```{r}
@@ -305,7 +315,17 @@ library(pscl)
 
 ConiferZeroInfl <- zeroinfl(conifer_total~burn_sev_category*forest_type, data=ThesisAll1)
 summary(ConiferZeroInfl)
+Anova(ConiferZeroInfl, type = 3)
 ```
+
+
+
+```{r}
+emoutConiferZInfl <- emmeans(ConiferZeroInfl, ~burn_sev_category*forest_type, type= "response")
+pairs(emoutConiferZInfl)
+cld(emoutConiferZInfl)
+```
+
 
 # Conifer negative binomial regression
 
