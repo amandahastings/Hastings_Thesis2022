@@ -1,0 +1,195 @@
+---
+title: "Thesis2023_NewNMDS"
+author: "Amanda Hastings"
+date: "2022-12-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
+
+#Load libraries
+library(tidyverse)
+library(dplyr)
+library(RColorBrewer)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+library(ggthemes)
+library(vegan)
+library(ggvegan)
+library(ggpubr)
+library(viridis)
+```
+
+## Formatting raw thesis site data and seedlings data 
+
+```{r}
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+ThesisSeedlings <- ThesisSeedlingsData %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13'))%>% 
+  dplyr::select(!c(Fire_name, regen_radius, regenplot_size_m2, regenplot_size_ha))%>% 
+  select_if(~!any(is.na(.)))
+
+## Add coarse woody debris calculations 
+CWD_Data <- read.csv("CWDCalculations10.4.22.csv") %>%
+  group_by(PlotID) %>%
+  mutate("PlotSum_CWD" = sum(Mg.plot..ha.)) %>%
+  ungroup() %>%
+  dplyr::select(PlotID, PlotSum_CWD) %>%
+  filter(!duplicated(PlotID)) %>%
+  filter(!PlotID %in% c('LS11','HS02','HS13'))%>% 
+  rename("CWD" = PlotSum_CWD)
+
+ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>% 
+  arrange(PlotID)%>% 
+  mutate(forest_type = factor(forest_type))%>% 
+  mutate(burn_sev_category = factor(burn_sev_category))%>% 
+  full_join(., CWD_Data, by= "PlotID" )
+```
+
+## Terraclimate calculations 
+
+## Annual Climate Variables: VPD and CWD 
+
+```{r}
+#vpd.kPa.
+#def.mm.
+AnnualAvgTerra <- TerraData %>%
+  group_by(SiteID) %>% 
+  summarize(meanVPD = mean(vpd.kPa.), 
+            sdVPD = sd(vpd.kPa.), 
+            meanCWD = mean(def.mm.), 
+            sdCWD = sd(def.mm.)) 
+
+PostAnnual3yr <- TerraData %>% 
+  group_by(SiteID, Year)%>% 
+  filter(Year == 2019:2021)%>% 
+  group_by(SiteID)%>%
+  summarize(mean3yrVPD = mean(vpd.kPa.),
+            mean3yrCWD = mean(def.mm.))
+
+AnnualDeviation <- inner_join(AnnualAvgTerra,PostAnnual3yr)%>% 
+  mutate("dev3yrVPD" = (mean3yrVPD - meanVPD)/sdVPD)%>% 
+  mutate("dev3yrCWD" = (mean3yrCWD - meanCWD)/sdCWD)
+```
+
+## Growing Season Climate Variables: Max Temp, Min Temp, Precip, Soil Moisture
+
+```{r}
+#tmax.degC. 
+#tmin.degC.
+#ppt.mm.
+#soil.mm.
+GrowSeasonAvgTerra <- TerraData %>%
+  filter(Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID) %>% 
+  summarize(meanTmax = mean(tmax.degC.), 
+            sdTmax = sd(tmax.degC.), 
+            meanTmin = mean(tmin.degC.), 
+            sdTmin = sd(tmin.degC.),
+            meanPrecip = mean(ppt.mm.),
+            sdPrecip = sd(ppt.mm.),
+            meanSoil = mean(soil.mm.), 
+            sdSoil = sd(soil.mm.)) 
+
+PostGrowTerra3yr <- TerraData %>%
+  group_by(SiteID, Year)%>%
+  filter(Year == 2019:2021 & Month %in% c(4,5,6,7,8,9))%>%
+  group_by(SiteID)%>%
+  summarize(mean3yrTmax = mean(tmax.degC.),
+            mean3yrTmin = mean(tmin.degC.),
+            mean3yrPrecip = mean(ppt.mm.),
+            mean3yrSoil = mean(soil.mm.))
+
+GrowDeviation <- inner_join(GrowSeasonAvgTerra,PostGrowTerra3yr)%>%
+  mutate("dev3yrTmax" = (mean3yrTmax - meanTmax)/sdTmax)%>% 
+  mutate("dev3yrTmin" = (mean3yrTmin - meanTmin)/sdTmin)%>% 
+  mutate("dev3yrPrecip" = (mean3yrPrecip - meanPrecip)/sdPrecip)%>%
+  mutate("dev3yrSoil"= (mean3yrSoil - meanSoil)/sdSoil)
+  
+```
+
+## Data frame with deviations 
+
+```{r}
+ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
+ 
+```
+
+## Full data frame with terraclimate and thesis data
+
+```{r}
+#Combine field-collected data and terraclimate data
+ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
+  
+```
+
+
+## NMDS response data frame
+
+```{r}
+ThesisNewNMDSResponse <- ThesisAll1 %>% 
+  dplyr::select(PlotID, forest_type, POTR_total, QUGA_total, RONE_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total)%>%
+  filter(!PlotID %in% 'LS02')%>%
+    rename(
+    "POTR" = POTR_total,
+    "QUGA" = QUGA_total,
+    "RONE" = RONE_total,
+    "PSME" = PSME_total,
+    "ABCO" = ABCO_total,
+    "PICO" = PICO_total, 
+    "PIFL" = PIFL_total,
+    "PIAR" = PIAR_total
+  )%>% 
+  mutate_at(c("POTR", "QUGA", "RONE", "PSME", "ABCO", "PICO","PIFL", "PIAR"), as.integer)%>% 
+  dplyr:: select(-forest_type)%>% 
+  remove_rownames %>% 
+  column_to_rownames(var="PlotID")%>% 
+  decostand(., method = "max")
+  
+
+str(ThesisNewNMDSResponse)
+
+```
+
+
+```{r}
+#NMDS Lower Montane 
+NMDS_AllSites <- metaMDS(ThesisNewNMDSResponse, distance = "euclidean", k=3, autotransform = T, wascores=T)
+ordiplot(NMDS_AllSites, type="t")
+# str(NMDS_LowerMontane)
+vegan:: stressplot(NMDS_AllSites)
+NMDS_AllSites
+
+```
+
+
+```{r}
+#OVerlay predictors data frame 
+OverlayPredictors2 <- ThesisAll1 %>% 
+  dplyr::select(PlotID, burn_sev_category, forest_type, field.elevation..m., slope...., gm_cover, fb_cover, sh_cover, aspect_rescaled, heat_load, bg_cover, lt_cover, wd_cover, rk_cover, live_ba, conifer_seed_source, PSME_seed_source, ABCO_seed_source, PICO_seed_source, PIFL_seed_source, PIAR_seed_source)%>%
+  rowwise()%>%
+  mutate(barren_cover = sum(c(bg_cover,rk_cover)))%>% 
+  mutate(organic_cover = sum(c(lt_cover,wd_cover)))%>% 
+  dplyr::select(!c(bg_cover:rk_cover))%>% 
+  rename(
+    "Graminoids" = gm_cover,
+    "Forbs" = fb_cover,
+    "Shrubs" = sh_cover)
+
+```
+
+
+

@@ -145,10 +145,38 @@ ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", al
 ## NMDS response data frames relativized by maximum value
 
 ```{r}
+#NMDS with all forest types in one 
 ThesisNMDSResponse <- ThesisAll1 %>% 
   dplyr::select(PlotID, forest_type, gm_cover, fb_cover, sh_cover, tr_cover, POTR_total, QUGA_total, RONE_total, PIPO_total, PSME_total, ABCO_total, PICO_total, PIFL_total, PIAR_total, ABLA_total, PIEN_total)%>% 
   mutate_at(vars(PIPO_total,ABLA_total,PIEN_total), as.numeric)
 
+ThesisNMDSResponse1 <- ThesisNMDSResponse %>% 
+  replace(is.na(.),0)
+
+
+#NMDS for all sites
+max_NMDSdf_all <- ThesisNMDSResponse1 %>% 
+  filter(!PlotID %in% 'LS02')%>%
+  dplyr::select(!c(forest_type, PIPO_total, ABCO_total, ABLA_total, PIEN_total)) %>% 
+  remove_rownames %>% 
+  column_to_rownames(var="PlotID") %>% 
+  decostand(., method = "max") %>% 
+  dplyr::select(-tr_cover)%>% 
+  rename(
+    "Graminoids" = gm_cover,
+    "Forbs" = fb_cover,
+    "Shrubs" = sh_cover,
+    "POTR" = POTR_total,
+    "QUGA" = QUGA_total,
+    "RONE" = RONE_total,
+    "PSME" = PSME_total,
+    # "ABCO" = ABCO_total,
+    "PICO" = PICO_total, 
+    "PIFL" = PIFL_total,
+    "PIAR" = PIAR_total
+  )
+  
+  
 #Lower Montane max relative df
 max_NMDSdf_LowerMontane <- ThesisNMDSResponse %>% 
   filter(forest_type == "Lower Montane")%>%
@@ -433,12 +461,15 @@ OverlayPred_Subalpine <- OverlayPredictors1 %>%
 ## NMDS objects
 
 ```{r}
+#NMDS all sites
+
+NMDS_all <- metaMDS(max_NMDSdf_all, distance = "euclidean", k=3, autotransform = F, wascores = T)
 
 #NMDS Lower Montane 
-NMDS_LowerMontane <- metaMDS(max_NMDSdf_LowerMontane, distance = "euclidean", autotransform = F, wascores=T)
-ordiplot(NMDS_LowerMontane, type="t", main = "Lower Montane")
+NMDS_LowerMontane <- metaMDS(max_NMDSdf_LowerMontane, distance = "euclidean", k=2, autotransform = F, wascores=T)
+# ordiplot(NMDS_LowerMontane, type="t", main = "Lower Montane")
 # str(NMDS_LowerMontane)
-vegan:: stressplot(NMDS_LowerMontane)
+# vegan:: stressplot(NMDS_LowerMontane)
 NMDS_LowerMontane
 
 
@@ -449,17 +480,17 @@ NMDS_LowerMontane
 
 #NMDS Upper Montane 
 NMDS_UpperMontane <- metaMDS(max_NMDSdf_UpperMontane, distance = "euclidean", k=2, autotransform = F, wascores = T)
-ordiplot(NMDS_UpperMontane, type = 't', main = "Upper Montane")
-# str(NMDS_UpperMontane)
-vegan:: stressplot(NMDS_UpperMontane)
+# ordiplot(NMDS_UpperMontane, type = 't', main = "Upper Montane")
+# # str(NMDS_UpperMontane)
+# vegan:: stressplot(NMDS_UpperMontane)
 NMDS_UpperMontane
 
 
 #NMDS Subalpine 
 NMDS_Subalpine <- metaMDS(max_NMDSdf_Subalpine, distance = "euclidean", k=2, autotransform = F, wascores = T)
-ordiplot(NMDS_Subalpine, type = 't', main = "Subalpine")
-# str(NMDS_Subalpine)
-vegan:: stressplot(NMDS_Subalpine)
+# ordiplot(NMDS_Subalpine, type = 't', main = "Subalpine")
+# # str(NMDS_Subalpine)
+# vegan:: stressplot(NMDS_Subalpine)
 NMDS_Subalpine
 
 ```
