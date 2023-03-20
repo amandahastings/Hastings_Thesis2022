@@ -33,6 +33,7 @@ library(vegan)
 library(ggvegan)
 library(ggpubr)
 library(viridis)
+library(writexl)
 ```
 
 ## Formatting raw thesis site data and seedlings data 
@@ -71,8 +72,17 @@ ThesisAll1 <- full_join(ThesisData, ThesisSeedlings, by= "PlotID") %>%
 ```{r}
 #vpd.kPa.
 #def.mm.
-AnnualAvgTerra <- TerraData %>%
+
+PlotIDForestType <- ThesisData %>% 
+  dplyr::select(PlotID, forest_type)
+
+
+
+
+
+AnnualAvgTerra <- TerraDataJoined %>%
   group_by(SiteID) %>% 
+  filter(Year == 1991:2021)%>%
   summarize(meanVPD = mean(vpd.kPa.), 
             sdVPD = sd(vpd.kPa.), 
             meanCWD = mean(def.mm.), 
@@ -88,7 +98,54 @@ PostAnnual3yr <- TerraData %>%
 AnnualDeviation <- inner_join(AnnualAvgTerra,PostAnnual3yr)%>% 
   mutate("dev3yrVPD" = (mean3yrVPD - meanVPD)/sdVPD)%>% 
   mutate("dev3yrCWD" = (mean3yrCWD - meanCWD)/sdCWD)
+
+AnnualDeviationJoined <- merge(AnnualDeviation, PlotIDForestType, by.x = "SiteID", by.y = "PlotID", all = T)
+
 ```
+
+
+
+## Annual Climate Variables by forest type: 
+
+```{r}
+
+PlotIDForestType <- ThesisData %>% 
+  dplyr::select(PlotID, forest_type)
+
+
+TerraDataJoined <- merge(TerraData, PlotIDForestType, by.x = "SiteID", by.y = "PlotID", all = T)
+  
+##Same but group by forest type 
+AnnualAvgTerra_ForestTypes <- TerraDataJoined %>%
+  group_by(forest_type) %>%
+  # filter(Year == 1991:2021)%>%
+  summarize(meanVPD = mean(vpd.kPa.), 
+            sdVPD = sd(vpd.kPa.), 
+            meanCWD = mean(def.mm.), 
+            sdCWD = sd(def.mm.)) 
+
+PostAnnual3yr_ForestTypes <- TerraDataJoined %>% 
+  group_by(forest_type, Year)%>% 
+  filter(Year == 2019:2021)%>% 
+  group_by(forest_type)%>%
+  summarize(mean3yrVPD = mean(vpd.kPa.),
+            mean3yrCWD = mean(def.mm.))
+
+AnnualDeviation_ForestTypes <- inner_join(AnnualAvgTerra_ForestTypes,PostAnnual3yr_ForestTypes)%>% 
+  mutate("dev3yrVPD" = (mean3yrVPD - meanVPD)/sdVPD)%>% 
+  mutate("dev3yrCWD" = (mean3yrCWD - meanCWD)/sdCWD)
+
+```
+
+
+
+```{r}
+ggplot(AnnualDeviationJoined,
+       aes(x = forest_type, y = dev3yrVPD))+ 
+  geom_boxplot()
+```
+
+
 
 ## Growing Season Climate Variables: Max Temp, Min Temp, Precip, Soil Moisture
 
@@ -102,8 +159,8 @@ GrowSeasonAvgTerra <- TerraData %>%
   group_by(SiteID) %>% 
   summarize(meanTmax = mean(tmax.degC.), 
             sdTmax = sd(tmax.degC.), 
-            meanTmin = mean(tmin.degC.), 
-            sdTmin = sd(tmin.degC.),
+            # meanTmin = mean(tmin.degC.), 
+            # sdTmin = sd(tmin.degC.),
             meanPrecip = mean(ppt.mm.),
             sdPrecip = sd(ppt.mm.),
             meanSoil = mean(soil.mm.), 
@@ -114,13 +171,13 @@ PostGrowTerra3yr <- TerraData %>%
   filter(Year == 2019:2021 & Month %in% c(4,5,6,7,8,9))%>%
   group_by(SiteID)%>%
   summarize(mean3yrTmax = mean(tmax.degC.),
-            mean3yrTmin = mean(tmin.degC.),
+            # mean3yrTmin = mean(tmin.degC.),
             mean3yrPrecip = mean(ppt.mm.),
             mean3yrSoil = mean(soil.mm.))
 
 GrowDeviation <- inner_join(GrowSeasonAvgTerra,PostGrowTerra3yr)%>%
   mutate("dev3yrTmax" = (mean3yrTmax - meanTmax)/sdTmax)%>% 
-  mutate("dev3yrTmin" = (mean3yrTmin - meanTmin)/sdTmin)%>% 
+  # mutate("dev3yrTmin" = (mean3yrTmin - meanTmin)/sdTmin)%>% 
   mutate("dev3yrPrecip" = (mean3yrPrecip - meanPrecip)/sdPrecip)%>%
   mutate("dev3yrSoil"= (mean3yrSoil - meanSoil)/sdSoil)
   
@@ -140,6 +197,16 @@ ThesisTerra <- inner_join(AnnualDeviation, GrowDeviation)
 ThesisAll <- merge(ThesisAll1, ThesisTerra, by.x = "PlotID", by.y = "SiteID", all = T)
   
 ```
+
+
+## Plot ID with Climate Variables of interest
+
+```{r}
+ClimateSumStats <- ThesisAll %>%
+  dplyr::select(PlotID, forest_type, meanVPD, meanCWD, meanTmax, meanPrecip, mean3yrVPD, mean3yrCWD, mean3yrTmax, mean3yrPrecip, dev3yrVPD, dev3yrCWD, dev3yrTmax, dev3yrPrecip)
+```
+
+
 
 
 ## NMDS response data frames relativized by maximum value

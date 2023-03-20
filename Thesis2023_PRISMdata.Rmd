@@ -69,15 +69,15 @@ PRISM_Normals_ForestTypes <- PRISM_Normals_ID %>%
             mean_VPDmin = mean(AnnualVPDmin.hPa), 
             mean_VPDmax = mean(AnnualVPDmax.hPa), 
             mean_JanMin = mean(JanuaryMin), 
-            mean_JulyMax = mean(JulyMax), 
-            sd_AnnualPrecip = sd(TotalAnnualPrecipitation.mm), 
-            sd_GrowPrecip = sd(GrowingSeasonPrecip.mm), 
-            sd_GrowminTemp = sd(GrowingSeasonTemp.minC), 
-            sd_GrowmaxTemp = sd(GrowingSeasonTemperature.maxC),
-            sd_VPDmin = sd(AnnualVPDmin.hPa), 
-            sd_VPDmax = sd(AnnualVPDmax.hPa), 
-            sd_JanMin = sd(JanuaryMin), 
-            sd_JulyMax = sd(JulyMax))
+            mean_JulyMax = mean(JulyMax))
+            # sd_AnnualPrecip = sd(TotalAnnualPrecipitation.mm), 
+            # sd_GrowPrecip = sd(GrowingSeasonPrecip.mm), 
+            # sd_GrowminTemp = sd(GrowingSeasonTemp.minC), 
+            # sd_GrowmaxTemp = sd(GrowingSeasonTemperature.maxC),
+            # sd_VPDmin = sd(AnnualVPDmin.hPa), 
+            # sd_VPDmax = sd(AnnualVPDmax.hPa), 
+            # sd_JanMin = sd(JanuaryMin), 
+            # sd_JulyMax = sd(JulyMax))
 
 PRISM_PostFire_3yrMeans <- PRISM_PostFire_ID %>% 
   mutate("JanMin.3yr" = (JanMin.2019+JanMin.2020+JanMin.2021)/3)%>% 

@@ -132,7 +132,7 @@ PlantCoverPlot1 <- ggplot(
   geom_boxplot() + 
   # ylim(0, 0.6) +
   facet_wrap(~ FunctionalGroup, ncol = 4) +
-  labs(x = "Forest Type",
+  labs(x = "",
        y = "Percent Cover",
        fill = "Burn Severity") +
   theme(legend.position = "bottom",
@@ -143,7 +143,7 @@ PlantCoverPlot1 <- ggplot(
     labels = c("High", "Low"), values=c("#bd0026","#fd8d3c"))+
   theme(axis.text.x = element_text(
     color = "black",
-    size = 7,
+    size = 11,
     angle = 90,
     vjust = 0.25, 
     hjust = 1,
