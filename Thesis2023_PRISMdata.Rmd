@@ -1,0 +1,84 @@
+---
+title: "PrismData"
+author: "Amanda Hastings"
+date: "2023-03-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## PRISM Climate Data 
+
+```{r}
+#Read in data 
+ThesisDataRaw <- read.csv("HastingsA_MasterThesisData8.8.22.csv")
+TerraData <- read.csv("HastingsA_TerraclimateMaster8.16.csv")
+ThesisSeedlingsData <- read.csv("HastingsA_MasterSeedlingsData9.12.22.csv")
+
+#Load libraries
+library(tidyverse)
+library(dplyr)
+library(RColorBrewer)
+library(emmeans)
+library(multcomp)
+library(multcompView)
+library(ggthemes)
+library(vegan)
+library(ggvegan)
+library(ggpubr)
+library(viridis)
+library(writexl)
+```
+
+
+```{r}
+PRISM_Normals <- read.csv("PRISMNormalsData3.17.23.csv")
+PRISM_PostFire <- read.csv("PRISM_PostfireData3.17.23.csv")
+
+#Filter to only wanted sites in ThesisData 
+ThesisData <- ThesisDataRaw %>% 
+  filter(!PlotID %in% c('LS11','HS02','HS12','HS13', 'LS01_MV','LS02_MV','HS01_MV'))
+
+```
+
+
+
+## Annual Climate Variables by forest type: PRSIM
+
+```{r}
+
+PlotIDForestType <- ThesisData %>% 
+  dplyr::select(PlotID, forest_type)
+
+
+PRISM_Normals_ID <- merge(PRISM_Normals, PlotIDForestType, by.x = "Site", by.y = "PlotID", all = T)
+
+PRSIM_PostFire_ID <- merge(PRISM_PostFire, PlotIDForestType, by.x = "Site", by.y = "PlotID", all = T)
+  
+##Group by forest type  
+PRISM_Normals_ForestTypes <- PRISM_Normals_ID %>%
+  group_by(forest_type) %>%
+  summarize(mean_AnnualPrecip = mean(TotalAnnualPrecipitation.mm), 
+            mean_GrowPrecip = mean(GrowingSeasonPrecip.mm), 
+            mean_GrowminTemp = mean(GrowingSeasonTemp.minC), 
+            mean_GrowmaxTemp = mean(GrowingSeasonTemperature.maxC),
+            mean_VPDmin = mean(AnnualVPDmin.hPa), 
+            mean_VPDmax = mean(AnnualVPDmax.hPa), 
+            mean_JanuaryMin = mean(JanuaryMin), 
+            mean_JulyMax = mean(JulyMax))
+
+PostAnnual3yr_ForestTypes <- TerraDataJoined %>% 
+  group_by(forest_type, Year)%>% 
+  filter(Year == 2019:2021)%>% 
+  group_by(forest_type)%>%
+  summarize(mean3yrVPD = mean(vpd.kPa.),
+            mean3yrCWD = mean(def.mm.))
+
+AnnualDeviation_ForestTypes <- inner_join(AnnualAvgTerra_ForestTypes,PostAnnual3yr_ForestTypes)%>% 
+  mutate("dev3yrVPD" = (mean3yrVPD - meanVPD)/sdVPD)%>% 
+  mutate("dev3yrCWD" = (mean3yrCWD - meanCWD)/sdCWD)
+
+```
+
