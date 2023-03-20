@@ -30,6 +30,7 @@ library(ggvegan)
 library(ggpubr)
 library(viridis)
 library(writexl)
+library(xlsx)
 ```
 
 
@@ -48,7 +49,6 @@ ThesisData <- ThesisDataRaw %>%
 ## Annual Climate Variables by forest type: PRSIM
 
 ```{r}
-
 PlotIDForestType <- ThesisData %>% 
   dplyr::select(PlotID, forest_type)
 
@@ -69,7 +69,15 @@ PRISM_Normals_ForestTypes <- PRISM_Normals_ID %>%
             mean_VPDmin = mean(AnnualVPDmin.hPa), 
             mean_VPDmax = mean(AnnualVPDmax.hPa), 
             mean_JanMin = mean(JanuaryMin), 
-            mean_JulyMax = mean(JulyMax))
+            mean_JulyMax = mean(JulyMax), 
+            sd_AnnualPrecip = sd(TotalAnnualPrecipitation.mm), 
+            sd_GrowPrecip = sd(GrowingSeasonPrecip.mm), 
+            sd_GrowminTemp = sd(GrowingSeasonTemp.minC), 
+            sd_GrowmaxTemp = sd(GrowingSeasonTemperature.maxC),
+            sd_VPDmin = sd(AnnualVPDmin.hPa), 
+            sd_VPDmax = sd(AnnualVPDmax.hPa), 
+            sd_JanMin = sd(JanuaryMin), 
+            sd_JulyMax = sd(JulyMax))
 
 PRISM_PostFire_3yrMeans <- PRISM_PostFire_ID %>% 
   mutate("JanMin.3yr" = (JanMin.2019+JanMin.2020+JanMin.2021)/3)%>% 
@@ -94,21 +102,69 @@ PRISM_PostFire_ForestTypes <- PRISM_PostFire_3yrMeans %>%
             mean_VPDmax.3yr = mean(VPDmax.3yr), 
             mean_JanMin.3yr = mean(JanMin.3yr), 
             mean_JulyMax.3yr = mean(JulyMax.3yr))
-  
+
+
+PRISM_Comparison_ForestTypes <- inner_join(PRISM_Normals_ForestTypes,PRISM_PostFire_ForestTypes)
+
+
 
   
+# 
+# PRISM_Dev_ForestTypes <- inner_join(PRISM_Normals_ForestTypes,PRISM_PostFire_ForestTypes)%>% 
+#   mutate("AnnualPrecip_Dev"= (mean_AnnualPrecip.3yr - mean_AnnualPrecip)/sd_AnnualPrecip)%>% 
+#   mutate("GrowPrecip_Dev"=(mean_GrowPrecip.3yr - mean_GrowPrecip)/sd_GrowPrecip)%>%
+#   mutate("GrowMinTemp_Dev"=(mean_GrowminTemp.3yr - mean_GrowminTemp)/sd_GrowminTemp)%>%
+#   mutate("GrowMaxTemp_Dev"=( mean_GrowmaxTemp.3yr -  mean_GrowmaxTemp)/sd_GrowmaxTemp)%>%
+#   mutate("JanMin_Dev" = (mean_JanMin.3yr - mean_JanMin)/sd_JanMin)%>% 
+#   mutate("JulyMax_Dev" = (mean_JulyMax.3yr - mean_JulyMax)/sd_JulyMax)%>% 
+#   mutate("VPDmin_Dev"=(mean_VPDmin.3yr - mean_VPDmin)/sd_VPDmin)%>%
+#   mutate("VPDmax_Dev"=(mean_VPDmax.3yr -  mean_VPDmax)/sd_VPDmax)
+```
 
-PRISMDeviation_ForestTypes <- inner_join(PRISM_Normals_ForestTypes,PRISMPostFire_ForestTypes)%>% 
-  mutate("AnnualPrecip_Dev"= (mean_AnnualPrecip.3yr - mean_AnnualPrecip)/sd_AnnualPrecip)%>% 
-  mutate("GrowPrecip_Dev"=(mean_GrowPrecip.3yr - mean_GrowPrecip)/sd_GrowPrecip)%>%
-  mutate("GrowMinTemp_Dev"=(mean_GrowminTemp.3yr - mean_GrowminTemp)/sd_GrowminTemp)%>%
-  mutate("GrowMaxTemp_Dev"=( mean_GrowmaxTemp.3yr =  mean_GrowmaxTemp)/sd_GrowmaxTemp)%>%
-  mutate("JanMin_Dev" = (mean_JanMin.3yr - mean_JanMin)/sd_JanMin)%>% 
-  mutate("JulyMax_Dev" = (mean_JulyMax.3yr - mean_JulyMax)/sd_JulyMax)%>% 
-  mutate("VPDmin_Dev"=(mean_VPDmin.3yr - mean_VPDmin)/sd_VPDmin)%>%
-  mutate("VPDmax_Dev"=(mean_VPDmax.3yr -  mean_VPDmax)/sd_VPDmax)
- 
-         
-         
+
+```{r}
+## Terraclimate calculations 
+
+## Annual Climate Variables: VPD and CWD 
+
+#vpd.kPa.
+#def.mm.
+
+TerraDataJoined <- merge(TerraData, PlotIDForestType, by.x = "SiteID", by.y = "PlotID", all = T) 
+
+TerraDataNormalsYears <- TerraDataJoined %>% 
+  filter(Year == 1991:2020)%>% 
+  group_by(forest_type)%>% 
+  summarize(meanCWD = mean(def.mm.))
+
+
+TerraDataPostFire <- TerraDataJoined %>% 
+  filter(Year == 2019:2021) %>% 
+  group_by(forest_type)%>% 
+  summarize(meanCWDpostfire = mean(def.mm.))
+
+
+
+Terra_Comparison_ForestTypes <- inner_join(TerraDataNormalsYears,TerraDataPostFire)
+
+AllClimate <- inner_join(PRISM_Comparison_ForestTypes, Terra_Comparison_ForestTypes)
+
+write.xlsx(AllClimate,'AllClimate3.19.23.xlsx', sheetName = "Sheet1")
+
+
+
+# PostAnnual3yr <- TerraData %>% 
+#   group_by(SiteID, Year)%>% 
+#   filter(Year == 1991:2020)%>% 
+#   group_by(SiteID)%>%
+#   summarize(mean3yrVPD = mean(vpd.kPa.),
+#             mean3yrCWD = mean(def.mm.))
+# 
+# AnnualDeviation <- inner_join(AnnualAvgTerra,PostAnnual3yr)%>% 
+#   mutate("dev3yrVPD" = (mean3yrVPD - meanVPD)/sdVPD)%>% 
+#   mutate("dev3yrCWD" = (mean3yrCWD - meanCWD)/sdCWD)
+# 
+# AnnualDeviationJoined <- merge(AnnualDeviation, PlotIDForestType, by.x = "SiteID", by.y = "PlotID", all = T)
+
 ```
 
